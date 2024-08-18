@@ -3,6 +3,27 @@ from bs4 import BeautifulSoup
 import json
 import os
 
+from dataclasses import dataclass
+
+@dataclass
+class Article:
+    url: str
+    type: str
+    postid: str
+    title: str
+    keywords: str
+    thumbnail: str
+    video_duration: str
+    word_count: int
+    lang: str
+    published_time: str
+    last_updated: str
+    author: str
+    description: str
+    full_text: str
+
+
+
 def fetch_sitemap(url):
     response = requests.get(url)
     response.raise_for_status()
@@ -22,40 +43,71 @@ def fetch_and_parse_article(url):
     response = requests.get(url)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Extracting script data
     script_tag = soup.find('script', {'type': 'text/tawsiyat'})
     if script_tag:
-        return json.loads(script_tag.text)
+        data = json.loads(script_tag.text)
+        full_text = ' '.join([p.text for p in soup.find_all('p')])
+
+        # Creating an Article instance
+        article = Article(
+            type=data.get('type',''),
+            postid=data.get('postid', ''),
+            title=data.get('title', ''),
+            url=data.get('url', ''),
+            keywords=data.get('keywords', ''),
+            thumbnail=data.get('thumbnail', ''),
+            video_duration=data.get('video_duration', ''),
+            word_count=int(data.get('word_count', 0)),
+            lang=data.get('lang', ''),
+            published_time=data.get('published_time',''),
+            last_updated=data.get('last_updated', ''),
+            description=data.get('description', ''),
+            author=data.get('author', ''),
+            full_text=full_text  # Add the extracted full text
+        )
+        return article
     return None
 
-def save_articles_data(all_data, directory='articles', file_name='articles_2023_08.json'): #change file name here
+
+def save_articles_data(all_articles, directory='articles', file_name='articles_2023_11.json'):
     if not os.path.exists(directory):
         os.makedirs(directory)
     file_path = os.path.join(directory, file_name)
     with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(all_data, f, ensure_ascii=False, indent=4)
+        articles_data = [article.__dict__ for article in all_articles]
+        json.dump(articles_data, f, ensure_ascii=False, indent=4)
     print(f"All articles saved to {file_path}")
 
+
 # Main Function
-#change url here
-sitemap_url = 'https://www.almayadeen.net/sitemaps/all/sitemap-2023-8.xml'
+sitemap_url = 'https://www.almayadeen.net/sitemaps/all/sitemap-2023-11.xml'  # change url for each month
+file_name = 'articles_2023_11.json'  # change file name
+number_of_articles = 300  # nb of articles
+
+# Fetch sitemap and article URLs
 sitemap_content = fetch_sitemap(sitemap_url)
 url_count = count_urls_in_sitemap_length(sitemap_content)
-
 print(f"Total URLs found: {url_count}")
+
 urls = extract_urls_from_sitemap(sitemap_content)
+urls = urls[:number_of_articles]
 
-#change nb of artivle here
-urls = urls[:300]
-
+# Process each URL and fetch articles
 all_articles = []
+
+article_count = 0
+
 for url in urls:
-    article_data = fetch_and_parse_article(url)
-    if article_data:
-        all_articles.append(article_data)
-        print(f"Article from {url} added to {os.path.join('articles', 'articles_2023_08.json')}") #change file name here
+    article = fetch_and_parse_article(url)
+    if article:
+        all_articles.append(article)
+        article_count += 1
+        print(f"Article {article_count} from {url} added to {os.path.join('articles', file_name)}")
     else:
         print(f"No data found for {url}")
 
-save_articles_data(all_articles)
-
+# Save all articles to JSON
+save_articles_data(all_articles, directory='articles', file_name=file_name)
 print(f"Total number of articles written to the JSON file: {len(all_articles)}")
