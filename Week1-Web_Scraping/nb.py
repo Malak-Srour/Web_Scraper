@@ -11,16 +11,19 @@ def count_articles_in_file(file_path):
         return "File not found."
 
 def count_articles_in_directory(directory):
-    """Counts the articles in all JSON files within the specified directory."""
-    file_names = sorted([f for f in os.listdir(directory) if f.startswith('articles_2024') and f.endswith('.json')])
+    """Counts the articles in all JSON files within the specified directory and returns the total count."""
+    file_names = sorted([f for f in os.listdir(directory) if f.startswith('articles_202') and f.endswith('.json')])
+    total_articles = 0  # Initialize total count
     article_counts = {}
     for file_name in file_names:
         file_path = os.path.join(directory, file_name)
         article_count = count_articles_in_file(file_path)
         article_counts[file_name] = article_count
+        total_articles += article_count  # Add count from each file to total
         print(f"Total articles in {file_name}: {article_count}")
-    return article_counts
+    print(f"\nGrand total of articles across all files: {total_articles}")  # Print total count of all articles
+    return article_counts, total_articles
 
 # Specify the directory where the JSON files are stored
 directory = 'articles'
-article_counts = count_articles_in_directory(directory)
+article_counts, grand_total = count_articles_in_directory(directory)
