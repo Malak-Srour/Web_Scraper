@@ -71,7 +71,7 @@ def fetch_and_parse_article(url):
     return None
 
 
-def save_articles_data(all_articles, directory='articles', file_name='articles_2024_01.json'):
+def save_articles_data(all_articles, directory='articles', file_name='articles_2023_11.json'):
     if not os.path.exists(directory):
         os.makedirs(directory)
     file_path = os.path.join(directory, file_name)
@@ -82,9 +82,9 @@ def save_articles_data(all_articles, directory='articles', file_name='articles_2
 
 
 # Main Function
-sitemap_url = 'https://www.almayadeen.net/sitemaps/all/sitemap-2024-1.xml'  # change url for each month
-file_name = 'articles_2024_01.json'  # change file name
-number_of_articles = 10  # nb of articles
+sitemap_url = 'https://www.almayadeen.net/sitemaps/all/sitemap-2023-11.xml'  # change url for each month
+file_name = 'articles_2023_11.json'  # change file name
+number_of_articles = 300  # nb of articles
 
 # Fetch sitemap and article URLs
 sitemap_content = fetch_sitemap(sitemap_url)
