@@ -198,14 +198,15 @@ def articles_by_year(year):
 def longest_articles():
     pipeline = [
         {"$sort": {"word_count": -1}},  # Sort articles by word count in descending order
-        {"$limit": 10}  # Limit the result to the top 10 articles
+        {"$limit": 10},  # Limit the result to the top 10 articles
+        {"$project": {"title": 1, "word_count": 1, "_id": 1}}  # Include title, word count, and _id
     ]
 
     result = list(collection.aggregate(pipeline))
 
-    # Format the result to include only the title and word count
+    # Format the result to include the title, word count, and _id
     formatted_result = [
-        f'"{article["title"]}" ({article["word_count"]} words)'
+        f'Article ID: {article["_id"]}, "{article["title"]}" ({article["word_count"]} words)'
         for article in result
     ]
 
@@ -589,10 +590,30 @@ def get_articles_by_date(date, articles_collection=None):
 
 
 
-# 28-
+# 28- articles_last_X_hours --> Returns a list of articles published in the last X hours.
+import pytz
 
+@app.route('/articles_last_X_hours/<int:x>', methods=['GET'])
+def articles_last_x_hours(x):
+    # Calculate the datetime X hours ago
+    utc_now = datetime.now(pytz.utc)
+    x_hours_ago = utc_now - timedelta(hours=x)
 
-# 29-
+    # Query to find articles published in the last X hours
+    query = {
+        "published_time": {"$gte": x_hours_ago.isoformat()}
+    }
+    results = list(collection.find(query, {"title": 1, "published_time": 1, "_id": 0}))
+
+    # Formatting results for response
+    formatted_results = [
+        f"{doc['title']} (Published within the last {x} hours)"
+        for doc in results
+    ]
+    if not results:
+        return jsonify({"message": f"No articles published in the last {x} hours found"}), 404
+    return jsonify(formatted_results)
+
 
 
 # 29-
