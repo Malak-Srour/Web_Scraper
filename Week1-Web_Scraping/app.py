@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-from bson.son import SON  # Needed for maintaining order in dictionary
 
 
 app = Flask(__name__)
