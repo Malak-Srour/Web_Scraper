@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 
@@ -9,6 +9,11 @@ app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 db = client["almayadeen"]
 collection = db["articles"]
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 
