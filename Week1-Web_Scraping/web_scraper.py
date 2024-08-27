@@ -73,8 +73,8 @@ def fetch_and_parse_article(url):
             last_updated=data.get('last_updated', ''),
             description=data.get('description', ''),
             author=data.get('author', ''),
-            full_text=full_text,  # Add the extracted full text
-            classes=classes  # Add the extracted classes
+            full_text=full_text,
+            classes=classes
         )
         return article
     return None
@@ -93,7 +93,7 @@ def save_articles_data(all_articles, directory='articles', file_name='articles_2
 # Main Function
 sitemap_url = 'https://www.almayadeen.net/sitemaps/all/sitemap-2024-1.xml'  # change URL for each month
 file_name = 'articles_2024_1.json'  # change file name
-number_of_articles = 1000  # number of articles
+number_of_articles = 500  # number of articles
 
 # Fetch sitemap and article URLs
 sitemap_content = fetch_sitemap(sitemap_url)
