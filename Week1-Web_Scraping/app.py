@@ -86,8 +86,25 @@ def articles_by_language():
     return jsonify({item['_id']: item['count'] for item in result})
 
 
-# 6-
+# 6- Route for articles by classes
+@app.route('/articles_by_classes', methods=['GET'])
+def get_articles_by_classes():
+    # MongoDB aggregation pipeline
+    pipeline = [
+        {"$unwind": "$classes"},  # Unwind the classes array
+        {"$group": {
+            "_id": "$classes.value",  # Group by the value in the classes array
+            "count": {"$sum": 1}  # Count the number of occurrences
+        }},
+    ]
 
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result for better readability
+    response = {item['_id']: item['count'] for item in result}
+
+    return jsonify(response)
 
 
 # 7- Route for getting articles by recent articles
@@ -108,14 +125,16 @@ def recent_articles():
 
 # 8- Route for getting articles by keyword/<keyword>-->Returns a list of articles that contain a specific keyword.
 @app.route('/articles_by_keyword/<keyword>', methods=['GET'])
-def articles_by_keyword(keyword):
-    # Search for articles that contain the keyword in their 'keywords' field
+def get_articles_by_keyword(keyword):
+    # MongoDB query to find articles that contain the specific keyword in the keywords array
     query = {"keywords": keyword}
-    articles = collection.find(query)
+    projection = {"_id": 0, "title": 1, "url": 1, "description": 1}   # Adjust projection to return fields you want
 
-    # Format the response to include only the titles of the articles
-    formatted_result = [article["title"] for article in articles]
-    return jsonify(formatted_result)
+    # Find all matching articles
+    articles = list(collection.find(query, projection))
+
+    # Return the list of titles
+    return jsonify(articles)
 
 
 # 9- Route for getting articles by author/<author_name>-->Returns all articles written by a specific author
@@ -134,7 +153,26 @@ def articles_by_author(author_name):
 
 
 # 10-
+@app.route('/top_classes', methods=['GET'])
+def get_top_classes():
+    # MongoDB aggregation pipeline
+    pipeline = [
+        {"$unwind": "$classes"},  # Unwind the classes array
+        {"$group": {
+            "_id": "$classes.value",  # Group by the value in the classes array
+            "count": {"$sum": 1}  # Count the number of occurrences
+        }},
+        {"$sort": {"count": -1}},  # Sort by count in descending order
+        {"$limit": 10}  # Limit to top 10 classes
+    ]
 
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result for better readability
+    response = {item['_id']: item['count'] for item in result}
+
+    return jsonify(response)
 
 
 # 11- Route for getting articles by author/
@@ -157,13 +195,16 @@ def article_details(postid):
 
 # 12- Route for getting articles with video -->Returns a list of articles that contain a video (where video_duration is not null).
 @app.route('/articles_with_video', methods=['GET'])
-def articles_with_video():
-    # Search for articles that have a non-null video_duration
-    articles = collection.find({"video_duration": {"$ne": None}})
+def get_articles_with_video():
+    # MongoDB query to find articles where video_duration is not null
+    query = {"video_duration": {"$ne": None}}
+    projection = {"_id": 0, "title": 1, "url": 1}  # Include both title and URL in the projection
 
-    # Format the response to include only the titles of the articles
-    formatted_result = [article["title"] for article in articles if "title" in article]
-    return jsonify(formatted_result)
+    # Find all matching articles
+    articles = list(collection.find(query, projection))
+
+    # Return the list of titles and URLs
+    return jsonify(articles)
 
 
 
@@ -196,7 +237,7 @@ def articles_by_year(year):
         return jsonify({f"{year}": "0 articles"}), 404
 
 
-### edit ###
+
 # 14- Route for getting the top 10 longest articles by word count
 @app.route('/longest_articles', methods=['GET'])
 def longest_articles():
@@ -258,31 +299,24 @@ def shortest_articles_not_zero():
 
 # 16- Route for getting articles grouped by the number of keywords
 @app.route('/articles_by_keyword_count', methods=['GET'])
-def articles_by_keyword_count():
+def get_articles_by_keyword_count():
+    # MongoDB aggregation pipeline
     pipeline = [
-        # Project the number of keywords in each article
-        {
-            "$project": {
-                "keyword_count": {"$size": {"$split": ["$keywords", ","]}}
-            }
-        },
-        # Group by the keyword count and count the number of articles
-        {
-            "$group": {
-                "_id": "$keyword_count",
-                "article_count": {"$sum": 1}
-            }
-        },
-        # Sort by keyword count in ascending order (optional)
-        {"$sort": {"_id": 1}}
+        {"$project": {"keyword_count": {"$size": "$keywords"}}},  # Calculate the number of keywords
+        {"$group": {
+            "_id": "$keyword_count",  # Group by the keyword count
+            "count": {"$sum": 1}  # Count the number of articles in each group
+        }},
+        {"$sort": {"_id": 1}}  # Optional: Sort by keyword count
     ]
 
+    # Execute the aggregation pipeline
     result = list(collection.aggregate(pipeline))
 
-    # Format the result to display the keyword count and number of articles
-    formatted_result = {f"{item['_id']} keywords": f"{item['article_count']} articles" for item in result}
+    # Format the result for better readability
+    response = {f"{item['_id']} keywords": item['count'] for item in result}
 
-    return jsonify(formatted_result)
+    return jsonify(response)
 
 
 # 17- Route for getting articles that have a thumbnail image
@@ -317,7 +351,20 @@ def articles_updated_after_publication():
 
 
 # 19-
+@app.route('/articles_by_coverage/<coverage>', methods=['GET'])
+def get_articles_by_coverage(coverage):
+    # MongoDB query to find articles where classes array contains the specified coverage
+    query = {"classes": {"$elemMatch": {"mapping": "coverage", "value": coverage}}}
+    projection = {"_id": 0, "title": 1}  # Adjust projection to return the fields you want
 
+    # Find all matching articles
+    articles = list(collection.find(query, projection))
+
+    # Extract just the titles for the response
+    titles = [article["title"] for article in articles]
+
+    # Return the list of titles
+    return jsonify(titles)
 
 
 # 20- Route for getting the most popular keywords from day X and after
@@ -432,42 +479,21 @@ def articles_by_word_count_range(min, max):
 
 # 23- Route for getting articles with a specific number of keywords
 @app.route('/articles_with_specific_keyword_count/<int:count>', methods=['GET'])
-def articles_with_specific_keyword_count(count):
-    # Define the pipeline to match articles with the exact keyword count
-    pipeline = [
-        # Project the number of keywords in each article
-        {
-            "$project": {
-                "keyword_count": {"$size": {"$split": ["$keywords", ","]}}
-            }
-        },
-        # Match articles with the specific keyword count
-        {
-            "$match": {
-                "keyword_count": count
-            }
-        },
-        # Group by the keyword count and count the number of articles
-        {
-            "$group": {
-                "_id": None,
-                "article_count": {"$sum": 1}
-            }
-        }
-    ]
+def get_articles_with_specific_keyword_count(count):
+    # MongoDB query to find articles with exactly the specified number of keywords
+    query = {"$expr": {"$eq": [{"$size": "$keywords"}, count]}}
+    projection = {"_id": 0, "title": 1, "keywords": 1}  # Include both title and keywords
 
-    result = list(collection.aggregate(pipeline))
+    # Find all matching articles
+    articles = list(collection.find(query, projection))
 
-    # Format the result
-    if result and result[0]['article_count'] > 0:
-        formatted_result = f"Articles with exactly {count} keywords ({result[0]['article_count']} articles)"
-    else:
-        formatted_result = f"Articles with exactly {count} keywords (0 articles)"
+    # Return the list of titles and keywords
+    return jsonify(articles)
 
-    return jsonify(formatted_result)
 
 
 # 24- Route for getting articles published on a specific date
+# example: 2024-08-10
 @app.route('/articles_by_specific_date/<string:date>', methods=['GET'])
 def articles_by_specific_date(date):
     try:
@@ -558,39 +584,25 @@ def articles_with_more_than(word_count):
 
 
 # 27-
-@app.route('/articles_by_specific_date/<date>', methods=['GET'])
-def get_articles_by_date(date, articles_collection=None):
-    # Convert date string to datetime object
-    try:
-        date = datetime.strptime(date, "%Y-%m-%d")
-    except ValueError:
-        return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
+@app.route('/articles_grouped_by_coverage', methods=['GET'])
+def get_articles_grouped_by_coverage():
+    # MongoDB aggregation pipeline
+    pipeline = [
+        {"$unwind": "$classes"},  # Unwind the classes array
+        {"$match": {"classes.mapping": "coverage"}},  # Match only classes with mapping 'coverage'
+        {"$group": {
+            "_id": "$classes.value",  # Group by the 'value' field where 'mapping' is 'coverage'
+            "count": {"$sum": 1}  # Count the number of articles in each group
+        }}
+    ]
 
-    # Calculate the start and end of the day
-    start_of_day = datetime(date.year, date.month, date.day)
-    end_of_day = datetime(date.year, date.month, date.day, 23, 59, 59)
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
 
-    # Query MongoDB for articles published within the given day
-    query = {
-        "published_time": {
-            "$gte": start_of_day.isoformat(),
-            "$lte": end_of_day.isoformat()
-        }
-    }
-    articles = list(articles_collection.find(query))
+    # Format the result without sorting
+    response = {f"Coverage on {item['_id']}": item['count'] for item in result}
 
-    # Prepare response data
-    if articles:
-        article_count = len(articles)
-        response_data = {
-            f'Articles published on "{date.strftime("%Y-%m-%d")}"': f"{article_count} articles"
-        }
-    else:
-        response_data = {
-            f'Articles published on "{date.strftime("%Y-%m-%d")}"': "No articles found"
-        }
-
-    return jsonify(response_data)
+    return jsonify(response)
 
 
 
