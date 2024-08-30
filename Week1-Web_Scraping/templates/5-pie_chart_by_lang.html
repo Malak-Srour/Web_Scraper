@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles by Language</title>
+    <!-- amCharts core -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <!-- amCharts percent -->
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <!-- amCharts themes -->
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Articles by Language</h1>
+    <div id="chartdiv"></div>
+
+    <script>
+        // Fetch the data from the server
+        fetch('/articles_by_language')
+            .then(response => response.json())
+            .then(data => {
+                // Process data into the format expected by amCharts
+                const formattedData = Object.keys(data).map(lang => ({
+                    category: lang,   // Language
+                    value: data[lang] // Count of articles
+                }));
+                createPieChart(formattedData);
+            });
+
+        function createPieChart(data) {
+            am5.ready(function() {
+
+                // Create root element
+                var root = am5.Root.new("chartdiv");
+
+                // Set themes
+                root.setThemes([
+                    am5themes_Animated.new(root)
+                ]);
+
+                // Create chart
+                var chart = root.container.children.push(am5percent.PieChart.new(root, {
+                    layout: root.verticalLayout
+                }));
+
+                // Create series
+                var series = chart.series.push(am5percent.PieSeries.new(root, {
+                    valueField: "value",
+                    categoryField: "category"
+                }));
+
+                // Set data
+                series.data.setAll(data);
+
+                // Create legend
+                var legend = chart.children.push(am5.Legend.new(root, {
+                    centerX: am5.percent(50),
+                    x: am5.percent(50),
+                    marginTop: 15,
+                    marginBottom: 15
+                }));
+
+                legend.data.setAll(series.dataItems);
+
+                // Play initial series animation
+                series.appear(1000, 100);
+
+            }); // end am5.ready()
+        }
+    </script>
+</body>
+</html>

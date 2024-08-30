@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Articles by Word Count</title>
+    <!-- amCharts core -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <!-- amCharts charts -->
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <!-- amCharts radar -->
+    <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+    <!-- amCharts themes -->
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Articles by Word Count</h1>
+    <div id="chartdiv"></div>
+
+    <script>
+        // Fetch the data from the server
+        fetch('/articles_by_word_count')
+            .then(response => response.json())
+            .then(data => {
+                // Process data into the format expected by amCharts
+                const formattedData = Object.keys(data).map(wordCount => ({
+                    category: wordCount.replace(' words', ''), // Remove 'words' text
+                    value: parseInt(data[wordCount])           // Convert article count to integer
+                }));
+                createRadarChart(formattedData);
+            });
+
+        function createRadarChart(data) {
+            am5.ready(function() {
+
+                // Create root element
+                var root = am5.Root.new("chartdiv");
+
+                // Set themes
+                root.setThemes([
+                    am5themes_Animated.new(root)
+                ]);
+
+                // Create chart
+                var chart = root.container.children.push(am5radar.RadarChart.new(root, {
+                    panX: false,
+                    panY: false,
+                    wheelX: "none",
+                    wheelY: "none",
+                    startAngle: -84,
+                    endAngle: 264,
+                    innerRadius: am5.percent(40)
+                }));
+
+                // Add cursor
+                const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
+                    behavior: "zoomX"
+                }));
+                cursor.lineY.set("forceHidden", true);
+
+                // Add scrollbar
+                chart.set("scrollbarX", am5.Scrollbar.new(root, {
+                    orientation: "horizontal",
+                    exportable: false
+                }));
+
+                // Create axes
+                var xRenderer = am5radar.AxisRendererCircular.new(root, {
+                    minGridDistance: 30
+                });
+
+                xRenderer.grid.template.set("forceHidden", true);
+
+                var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+                    maxDeviation: 0,
+                    categoryField: "category",
+                    renderer: xRenderer
+                }));
+
+                var yRenderer = am5radar.AxisRendererRadial.new(root, {});
+                yRenderer.labels.template.set("centerX", am5.p50);
+
+                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+                    maxDeviation: 0.3,
+                    min: 0,
+                    renderer: yRenderer
+                }));
+
+                // Add series
+                var series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
+                    name: "Articles",
+                    sequencedInterpolation: true,
+                    xAxis: xAxis,
+                    yAxis: yAxis,
+                    valueYField: "value",
+                    categoryXField: "category"
+                }));
+
+                // Rounded corners for columns
+                series.columns.template.setAll({
+                    cornerRadius: 5,
+                    tooltipText: "{categoryX} words: {valueY} articles"
+                });
+
+                // Make each column of a different color
+                series.columns.template.adapters.add("fill", function (fill, target) {
+                    return chart.get("colors").getIndex(series.columns.indexOf(target));
+                });
+
+                series.columns.template.adapters.add("stroke", function (stroke, target) {
+                    return chart.get("colors").getIndex(series.columns.indexOf(target));
+                });
+
+                // Set data
+                xAxis.data.setAll(data);
+                series.data.setAll(data);
+
+                // Make stuff animate on load
+                series.appear(1000);
+                chart.appear(1000, 100);
+
+            }); // end am5.ready()
+        }
+    </script>
+</body>
+</html>

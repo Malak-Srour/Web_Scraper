@@ -11,11 +11,120 @@ db = client["almayadeen"]
 collection = db["articles"]
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+#1
+@app.route('/generateCloud')
+def generateCloud():
+    return render_template('word_cloud,top_keywords.html')
+
+#2
+@app.route('/top_authors_chart')
+def top_authors_chart():
+    return render_template('2-bar-top_authors.html')
+
+#3
+@app.route('/by_date')
+def by_date():
+    return render_template('line_graph,articles_by_date.html')
+
+#4
+@app.route('/by_word_count')
+def by_word_count():
+    return render_template('4-hist,articles_by_word_count.html')
+
+#5
+@app.route('/by_lang')
+def by_lang():
+    return render_template('5-pie_chart_by_lang.html')
+
+#6
+
+#7
+@app.route('/by_recent_articles')
+def by_recent_articles():
+    return render_template('7-table_reent_articles.html')
+
+#8
+#9
+
+#10
+@app.route('/by_top_classes')
+def by_top_classes():
+    return render_template('10-semi_circle_pie_chart_top_classes.html')
+
+#11
+
+#12
+@app.route('/by_video')
+def by_video():
+    return render_template('12-bar_chart_with_video.html')
+
+#13
+
+#14
+@app.route('/by_longest_articles')
+def by_longest_articles():
+    return render_template('14-bar-longest_articles.html')
+
+#15
+@app.route('/by_shortest_articles_zero')
+def by_shortest_articles_zero():
+    return render_template('15-bar-shortest_articles_zero.html')
+
+@app.route('/by_shortest_articles')
+def by_shortest_articles():
+    return render_template('15-bar-shortest_articles.html')
+
+#16
+@app.route('/by_keyword_count')
+def keyword_count():
+    return render_template('16-hist-keyword_count.html')
+
+#17
+@app.route('/by_thumbnail')
+def by_thumbnail():
+    return render_template('17-pie-thumbnail.html')
+
+#18
+@app.route('/updated_after_pub')
+def updated_after_pub():
+    return render_template('18-bar-updated_after_pub.html')
 
 
+#19
+#20
+@app.route('/last_x_days')
+def last_x_days():
+    return render_template('20-line-chart-popular_in_x_days.html')
+
+
+#21
+@app.route('/by_month')
+def by_month():
+    return render_template('21-bar-articles_by_month.html')
+
+#22
+@app.route('/word_count_range')
+def word_count_range():
+    return render_template('22-hist-word_count_range.html')
+
+
+#23
+#24
+#25
+#26
+@app.route('/more_than_n_words')
+def more_than_n_words():
+    return render_template('26-more_than_word_count.html')
+
+#27
+#28
+#29
+@app.route('/length_of_title')
+def length_of_title():
+    return render_template('29-spiral-bar-chart-length_of_title.html')
+
+
+#30
 
 # 1- Route for getting top keywords
 @app.route('/top_keywords', methods=['GET'])
@@ -27,7 +136,12 @@ def top_keywords():
         {"$limit": 10}
     ]
     result = list(collection.aggregate(pipeline))
-    return jsonify(result)
+    jsonp_callback = request.args.get('callback')
+    if jsonp_callback:
+        content = f'{jsonp_callback}({jsonify(result).get_data(as_text=True)})'
+        return app.response_class(content, mimetype='application/javascript')
+    else:
+        return jsonify(result)
 
 
 
@@ -197,14 +311,31 @@ def article_details(postid):
 @app.route('/articles_with_video', methods=['GET'])
 def get_articles_with_video():
     # MongoDB query to find articles where video_duration is not null
-    query = {"video_duration": {"$ne": None}}
-    projection = {"_id": 0, "title": 1, "url": 1}  # Include both title and URL in the projection
+    query_with_video = {"video_duration": {"$ne": None}}
+    projection = {"_id": 0, "postid": 1, "url": 1}  # Include postid and URL in the projection
 
-    # Find all matching articles
-    articles = list(collection.find(query, projection))
+    # Find all matching articles with videos
+    articles_with_video = list(collection.find(query_with_video, projection))
 
-    # Return the list of titles and URLs
-    return jsonify(articles)
+    # Count the number of articles with videos
+    count_with_video = collection.count_documents(query_with_video)
+
+    # MongoDB query to find articles where video_duration is null
+    query_without_video = {"video_duration": None}
+
+    # Count the number of articles without videos
+    count_without_video = collection.count_documents(query_without_video)
+
+    # Prepare the response
+    response = {
+        "articles_with_video": articles_with_video,
+        "count_with_video": count_with_video,
+        "count_without_video": count_without_video
+    }
+
+    # Return the response as JSON
+    return jsonify(response)
+
 
 
 
@@ -324,12 +455,27 @@ def get_articles_by_keyword_count():
 def articles_with_thumbnail():
     # Find articles where the thumbnail field is not null or empty
     query = {"thumbnail": {"$ne": None, "$ne": ""}}
-    articles = collection.find(query)
+    articles_with_thumbnail = list(collection.find(query, {"title": 1, "_id": 0}))
 
-    # Format the response to include only the titles of the articles
-    formatted_result = [article["title"] for article in articles if "title" in article]
+    # Count the number of articles with a thumbnail
+    with_thumbnail_count = len(articles_with_thumbnail)
 
-    return jsonify(formatted_result)
+    # Count the number of articles without a thumbnail
+    without_thumbnail_count = collection.count_documents({"$or": [{"thumbnail": None}, {"thumbnail": ""}]})
+
+    # Extract the titles of the articles
+    titles = [article["title"] for article in articles_with_thumbnail if "title" in article]
+
+    # Add the counts to the response
+    result = {
+        "titles": titles,
+        "summary": {
+            "With Thumbnail": with_thumbnail_count,
+            "Without Thumbnail": without_thumbnail_count
+        }
+    }
+
+    return jsonify(result)
 
 
 # 18- Route for getting articles that were updated after publication
@@ -635,8 +781,8 @@ def articles_last_x_hours(x):
 # 29-
 @app.route('/articles_by_title_length', methods=['GET'])
 def articles_by_title_length():
-    # Query all articles
-    articles = collection.find({}, {"title": 1})  # Project to only include the title field
+    # Query all articles and project only the title field
+    articles = collection.find({}, {"title": 1})
 
     # Initialize a dictionary to count articles by title length
     title_length_count = {}
@@ -650,10 +796,15 @@ def articles_by_title_length():
             else:
                 title_length_count[word_count] = 1
 
-    # Format the response to include the word count and number of articles
-    response_data = {f'Titles with {length} words': f'{count} articles' for length, count in title_length_count.items()}
+    # Sort the dictionary by the word count (key) and create a sorted list of tuples
+    sorted_title_length_count = sorted(title_length_count.items())
 
-    return jsonify(response_data)
+    # Format the data for the chart
+    chart_data = [{"category": f"{length} words", "value": count} for length, count in sorted_title_length_count]
+
+    return jsonify(chart_data)
+
+
 
 
 

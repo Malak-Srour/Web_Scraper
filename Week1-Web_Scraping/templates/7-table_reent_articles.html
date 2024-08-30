@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+<style>
+  /* Base table styles */
+  #datatable table {
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  /* Header styles with blue and white */
+  #datatable table th {
+    background-color: #1565c0; /* Deep blue */
+    color: white; /* White text */
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  /* Cell styles */
+  #datatable table td {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    color: #1565c0; /* Deep blue text */
+  }
+
+  /* Row styles with alternating blue and white */
+  #datatable table tr:nth-child(even) {
+    background-color: #e3f2fd; /* Very light blue for even rows */
+  }
+
+  #datatable table tr:nth-child(odd) {
+    background-color: #ffffff; /* White for odd rows */
+  }
+
+  /* Hover effect */
+  #datatable table tr:hover {
+    background-color: #90caf9; /* Light sky blue on hover */
+    color: #fff; /* White text on hover */
+  }
+
+</style>
+</head>
+<body>
+
+<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/plugins/dataloader/dataloader.min.js"></script>
+<div id="datatable"></div>
+
+
+<script>
+  // Fetch the recent articles from the server
+  fetch('/recent_articles')
+    .then(response => response.json())
+    .then(data => {
+      // Create the table
+      var table = document.createElement("table");
+
+      // Add headers
+      var headerRow = document.createElement("tr");
+      var titleHeader = document.createElement("th");
+      titleHeader.innerHTML = "Title";
+      var dateHeader = document.createElement("th");
+      dateHeader.innerHTML = "Published Date";
+      headerRow.appendChild(titleHeader);
+      headerRow.appendChild(dateHeader);
+      table.appendChild(headerRow);
+
+      // Add rows
+      data.forEach(article => {
+        var row = document.createElement("tr");
+        var titleCol = document.createElement("td");
+        titleCol.innerHTML = article.title;
+        var dateCol = document.createElement("td");
+        dateCol.innerHTML = new Date(article.published_date).toLocaleDateString();
+        row.appendChild(titleCol);
+        row.appendChild(dateCol);
+        table.appendChild(row);
+      });
+
+      // Add table to document
+      document.getElementById("datatable").appendChild(table);
+    });
+</script>
+</body>
+</html>

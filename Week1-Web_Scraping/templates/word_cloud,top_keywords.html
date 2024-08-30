@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Top Keywords Word Cloud</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        #chartdiv {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chartdiv"></div>
+
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/plugins/wordCloud.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<script>
+    // JSONP Fetch Function
+    function getJSONP(url, success) {
+        var ud = '_' + +new Date,
+            script = document.createElement('script'),
+            head = document.getElementsByTagName('head')[0] || document.documentElement;
+
+        window[ud] = function(data) {
+            head.removeChild(script);
+            success && success(data);
+        };
+
+        script.src = url.replace('callback=?', 'callback=' + ud);
+        head.appendChild(script);
+    }
+
+    // Fetch data using JSONP and render the word cloud
+    getJSONP('http://127.0.0.1:5000/top_keywords?callback=?', function(data) {
+        // Initialize the word cloud chart
+        am4core.useTheme(am4themes_animated);
+
+        var chart = am4core.create("chartdiv", am4plugins_wordCloud.WordCloud);
+        var series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries());
+
+        series.accuracy = 4;
+        series.step = 15;
+        series.rotationThreshold = 0.7;
+        series.maxCount = 200;
+        series.minWordLength = 2;
+        series.labels.template.tooltipText = "{word}: {value}";
+        series.fontFamily = "Courier New";
+        series.maxFontSize = am4core.percent(30);
+
+        // Adding color to the words
+        series.colors = new am4core.ColorSet();
+        series.colors.passOptions = {}; // Makes sure all colors are used
+        series.angles = [0, -90];
+        series.fontWeight = "700";
+
+        // Map the fetched data to the word cloud series
+        series.data = data.map(item => ({
+            "word": item._id,  // Set the word from "_id"
+            "value": item.count  // Set the size from "count"
+        }));
+
+        // Specify the fields to use for word and value
+        series.dataFields.word = "word";
+        series.dataFields.value = "value";
+    });
+</script>
+
+</body>
+</html>
