@@ -1,6 +1,7 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, send_from_directory
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+import stanza
 
 
 app = Flask(__name__)
@@ -10,6 +11,112 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["almayadeen"]
 collection = db["articles"]
 
+# Initialize Stanza pipeline for Arabic NER
+nlp = stanza.Pipeline('ar', processors='tokenize,ner')
+
+
+# Route: Extract entities and store them in the database
+@app.route('/extract_entities', methods=['POST'])
+def extract_entities():
+    articles = collection.find()  # Retrieve all articles
+
+    for article in articles:
+        full_text = article.get("full_text", "")
+        doc = nlp(full_text)  # Perform NER with Stanza
+
+        # Extract entities and their types
+        entities = [{"entity": ent.text, "type": ent.type} for ent in doc.ents]
+
+        # Update the article with extracted entities
+        collection.update_one(
+            {"_id": article["_id"]},
+            {"$set": {"entities": entities}}
+        )
+
+    return jsonify({"message": "Entity recognition completed and stored."}), 200
+
+
+# Route: Get articles by entity
+@app.route('/articles_by_entity/<entity>', methods=['GET'])
+def get_articles_by_entity(entity):
+    # Search for articles where the 'entities' field contains the requested entity
+    articles = collection.find({"entities.entity": entity})
+
+    result = []
+    for article in articles:
+        result.append({
+            "id": str(article["_id"]),
+            "title": article.get("title", "No title"),
+            "full_text": article.get("full_text", ""),
+            "entities": article.get("entities", [])
+        })
+
+    return jsonify(result), 200
+
+
+@app.route('/')
+def home():
+    return send_from_directory(
+        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages', 'index.html'
+    )
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+# Route to serve CSS files
+@app.route('/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory(
+        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages/css', filename
+    )
+
+# Route to serve JS files from assets/demo
+@app.route('/assets/demo/<path:filename>')
+def serve_js_demo(filename):
+    return send_from_directory(
+        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages/assets/demo', filename
+    )
+
+
+@app.route('/articles_by_sentiment/<sentiment>', methods=['GET'])
+def get_articles_by_sentiment(sentiment):
+    articles = collection.find({'sentiment': sentiment})
+    result = []
+    for article in articles:
+        result.append({
+            'url': article['url'],
+            'title': article['title'],
+            'sentiment': article['sentiment'],
+            # Add any other fields you want to return
+        })
+    return jsonify(result)
+
+
+@app.route('/most_positive_articles', methods=['GET'])
+def get_most_positive_articles():
+    articles = collection.find().sort('sentiment_number', -1).limit(10)  # Sort by polarity in descending order (most positive)
+    result = []
+    for article in articles:
+        result.append({
+            'url': article['url'],
+            'title': article['title'],
+            'sentiment': article['sentiment'],
+            'sentiment_number': article['sentiment_number']
+        })
+    return jsonify(result)
+
+@app.route('/most_negative_articles', methods=['GET'])
+def get_most_negative_articles():
+    articles = collection.find().sort('sentiment_number', 1).limit(10)  # Sort by polarity in ascending order (most negative)
+    result = []
+    for article in articles:
+        result.append({
+            'url': article['url'],
+            'title': article['title'],
+            'sentiment': article['sentiment'],
+            'sentiment_number': article['sentiment_number']
+        })
+    return jsonify(result)
 
 #1
 @app.route('/generateCloud')
