@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <!-- amCharts core -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <!-- amCharts charts -->
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <!-- amCharts radar (if needed for radar charts) -->
+    <script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+    <!-- amCharts percent (needed for pie charts) -->
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <!-- amCharts themes -->
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <script src="https://cdn.amcharts.com/lib/5/themes/Responsive.js"></script>
+
+    <!-- amCharts hierarchy (needed for Force Directed tree) -->
+    <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
+
+    <style>
+        #chartdiv {
+            width: 100%;
+            height: auto;
+        }
+    </style>
+
+    {% block styles %}
+    {% endblock %}
+</head>
+<body>
+
+    <!-- Dynamic content (for the chart and title) -->
+    <h1>{{ title }}</h1>
+    <!-- Table container -->
+    <div id="datatable"></div>
+
+    <div id="controls">
+        {% block controls %}
+        {% endblock %}
+    </div>
+    <!-- Chart container -->
+    <div id="chartdiv"></div>
+
+    <!-- Include page-specific scripts -->
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>

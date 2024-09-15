@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    #chartdiv {
+        width: 100%;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<!-- amCharts resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<script>
+    am4core.ready(function() {
+
+        // Themes begin
+        am4core.useTheme(am4themes_animated);
+        // Themes end
+
+        // Create chart instance
+        var chart = am4core.create("chartdiv", am4charts.PieChart);
+        chart.hiddenState.properties.opacity = 0; // This creates initial fade-in
+        chart.radius = am4core.percent(70);
+        chart.innerRadius = am4core.percent(40);
+        chart.startAngle = 180;
+        chart.endAngle = 360;
+
+        // Set up series
+        var series = chart.series.push(new am4charts.PieSeries());
+        series.dataFields.value = "log_count";
+        series.dataFields.category = "sentiment";
+
+        series.slices.template.cornerRadius = 10;
+        series.slices.template.innerCornerRadius = 7;
+        series.slices.template.draggable = true;
+        series.slices.template.inert = true;
+        series.alignLabels = false;
+
+        series.hiddenState.properties.startAngle = 90;
+        series.hiddenState.properties.endAngle = 90;
+
+        // Add a legend
+        chart.legend = new am4charts.Legend();
+
+        // Fetch data from Flask route
+        fetch('/articles_by_sentiment_summary')
+            .then(response => response.json())
+            .then(data => {
+                // Apply a logarithmic transformation to the counts
+                const logData = data.map(item => ({
+                    sentiment: item.sentiment,
+                    log_count: Math.log10(item.count + 1) // Adding 1 to avoid log(0)
+                }));
+
+                // Set the chart's data
+                chart.data = logData;
+            })
+            .catch(error => console.error('Error fetching the data:', error));
+
+    }); // end am4core.ready()
+</script>
+{% endblock %}
+
+{% block controls %}
+<div id="chartdiv"></div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    #chartdiv {
+        width: 100%;
+        height: 300px;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}
+
+
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/articles_by_date.js') }}"></script>
+{% endblock %}

@@ -1,8 +1,6 @@
 from flask import Flask, jsonify, request, render_template, send_from_directory
 from pymongo import MongoClient
 from datetime import datetime, timedelta
-import stanza
-
 
 app = Flask(__name__)
 
@@ -11,248 +9,135 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["almayadeen"]
 collection = db["articles"]
 
-# Initialize Stanza pipeline for Arabic NER
-nlp = stanza.Pipeline('ar', processors='tokenize,ner')
 
-
-# Route: Extract entities and store them in the database
-@app.route('/extract_entities', methods=['POST'])
-def extract_entities():
-    articles = collection.find()  # Retrieve all articles
-
-    for article in articles:
-        full_text = article.get("full_text", "")
-        doc = nlp(full_text)  # Perform NER with Stanza
-
-        # Extract entities and their types
-        entities = [{"entity": ent.text, "type": ent.type} for ent in doc.ents]
-
-        # Update the article with extracted entities
-        collection.update_one(
-            {"_id": article["_id"]},
-            {"$set": {"entities": entities}}
-        )
-
-    return jsonify({"message": "Entity recognition completed and stored."}), 200
-
-
-# Route: Get articles by entity
-@app.route('/articles_by_entity/<entity>', methods=['GET'])
-def get_articles_by_entity(entity):
-    # Search for articles where the 'entities' field contains the requested entity
-    articles = collection.find({"entities.entity": entity})
-
-    result = []
-    for article in articles:
-        result.append({
-            "id": str(article["_id"]),
-            "title": article.get("title", "No title"),
-            "full_text": article.get("full_text", ""),
-            "entities": article.get("entities", [])
-        })
-
-    return jsonify(result), 200
-
-
-@app.route('/')
-def home():
-    return send_from_directory(
-        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages', 'index.html'
-    )
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
-
-# Route to serve CSS files
-@app.route('/css/<path:filename>')
-def serve_css(filename):
-    return send_from_directory(
-        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages/css', filename
-    )
-
-# Route to serve JS files from assets/demo
-@app.route('/assets/demo/<path:filename>')
-def serve_js_demo(filename):
-    return send_from_directory(
-        'startbootstrap-sb-admin-gh-pages (1)/startbootstrap-sb-admin-gh-pages/assets/demo', filename
-    )
+    return render_template('dashboard.html', title="Article Dashboard")
 
 
-@app.route('/articles_by_sentiment/<sentiment>', methods=['GET'])
-def get_articles_by_sentiment(sentiment):
-    articles = collection.find({'sentiment': sentiment})
-    result = []
-    for article in articles:
-        result.append({
-            'url': article['url'],
-            'title': article['title'],
-            'sentiment': article['sentiment'],
-            # Add any other fields you want to return
-        })
-    return jsonify(result)
-
-
-@app.route('/most_positive_articles', methods=['GET'])
-def get_most_positive_articles():
-    articles = collection.find().sort('sentiment_number', -1).limit(10)  # Sort by polarity in descending order (most positive)
-    result = []
-    for article in articles:
-        result.append({
-            'url': article['url'],
-            'title': article['title'],
-            'sentiment': article['sentiment'],
-            'sentiment_number': article['sentiment_number']
-        })
-    return jsonify(result)
-
-@app.route('/most_negative_articles', methods=['GET'])
-def get_most_negative_articles():
-    articles = collection.find().sort('sentiment_number', 1).limit(10)  # Sort by polarity in ascending order (most negative)
-    result = []
-    for article in articles:
-        result.append({
-            'url': article['url'],
-            'title': article['title'],
-            'sentiment': article['sentiment'],
-            'sentiment_number': article['sentiment_number']
-        })
-    return jsonify(result)
-
-#1
-@app.route('/generateCloud')
-def generateCloud():
-    return render_template('word_cloud,top_keywords.html')
-
-#2
+# 1
 @app.route('/top_authors_chart')
 def top_authors_chart():
-    return render_template('2-bar-top_authors.html')
+    return render_template('top_authors.html', title="Top Authors Chart")
+# 2
+@app.route('/articles_by_word_count_chart')
+def articles_by_word_count_chart():
+    return render_template('articles_by_word_count.html', title="Articles by Word Count")
+# 3
+@app.route('/articles_by_language_chart')
+def articles_by_language_chart():
+    return render_template('articles_by_language.html', title="Articles by Language")
 
-#3
-@app.route('/by_date')
-def by_date():
-    return render_template('line_graph,articles_by_date.html')
+# 4
+@app.route('/recent_articles_chart')
+def recent_articles_chart():
+    return render_template('recent_articles.html', title="Recent Articles")
+# 5
+@app.route('/articles_with_video_chart')
+def articles_with_video_chart():
+    return render_template('articles_with_video.html', title="Articles with and without Videos")
+# 6
+@app.route('/longest_articles_chart')
+def longest_articles_chart():
+    return render_template('longest_articles.html', title="Longest Articles by Word Count")
 
-#4
-@app.route('/by_word_count')
-def by_word_count():
-    return render_template('4-hist,articles_by_word_count.html')
-
-#5
-@app.route('/by_lang')
-def by_lang():
-    return render_template('5-pie_chart_by_lang.html')
-
-#6
-
-#7
-@app.route('/by_recent_articles')
-def by_recent_articles():
-    return render_template('7-table_reent_articles.html')
+# 7
+@app.route('/shortest_articles_chart')
+def shortest_articles_chart():
+    return render_template('shortest_articles.html', title="Shortest Articles (Non-Zero Word Count)")
 
 #8
-#9
+@app.route('/articles_by_keyword_count_chart')
+def articles_by_keyword_count_chart():
+    return render_template('articles_by_keyword_count.html', title="Articles by Keyword Count")
+
+# 9
+@app.route('/articles_by_thumbnail_chart')
+def articles_by_thumbnail_chart():
+    return render_template('articles_by_thumbnail.html', title="Articles by Thumbnail Presence")
 
 #10
-@app.route('/by_top_classes')
-def by_top_classes():
-    return render_template('10-semi_circle_pie_chart_top_classes.html')
+@app.route('/articles_updated_chart')
+def articles_updated_chart():
+    return render_template('articles_updated.html', title="Articles Updated After Publication")
 
-#11
+# 11
+@app.route('/popular_keywords_chart')
+def popular_keywords_chart():
+    return render_template('popular_keywords.html', title="Most Popular Keywords in the Last X Days")
 
-#12
-@app.route('/by_video')
-def by_video():
-    return render_template('12-bar_chart_with_video.html')
+# 12
+@app.route('/articles_by_month')
+def articles_by_month():
+    return render_template('articles_by_month.html', title="Articles by Published Month")
 
 #13
+@app.route('/articles_by_word_count_range')
+def articles_by_word_count_range():
+    return render_template('articles_by_word_count_range.html', title="Articles by Word Count Range")
 
-#14
-@app.route('/by_longest_articles')
-def by_longest_articles():
-    return render_template('14-bar-longest_articles.html')
+# 14
+@app.route('/articles_with_more_than')
+def articles_with_more_than():
+    return render_template('articles_with_more_than.html', title="Articles with More than N Words")
 
-#15
-@app.route('/by_shortest_articles_zero')
-def by_shortest_articles_zero():
-    return render_template('15-bar-shortest_articles_zero.html')
+# 15
+@app.route('/articles_by_title_length_chart')
+def articles_by_title_length_chart():
+    return render_template('articles_by_title_length.html', title="Articles by Title Length")
 
-@app.route('/by_shortest_articles')
-def by_shortest_articles():
-    return render_template('15-bar-shortest_articles.html')
+# 16
+@app.route('/articles_by_date_chart')
+def articles_by_date_chart():
+    return render_template('articles_by_date.html', title="Articles by Date")
 
-#16
-@app.route('/by_keyword_count')
-def keyword_count():
-    return render_template('16-hist-keyword_count.html')
+# 17
+@app.route('/top_keywords_charts')
+def top_keywords_wordcloud():
+    return render_template('top_keywords_wordcloud.html', title="Top Keywords Word Cloud")
 
-#17
-@app.route('/by_thumbnail')
-def by_thumbnail():
-    return render_template('17-pie-thumbnail.html')
+# 18
+@app.route('/articles_by_sentiment_chart', methods=['GET'])
+def articles_by_sentiment_chart():
+    return render_template('sentiment.html', title="Articles by Sentiment (Logarithmic)")
 
-#18
-@app.route('/updated_after_pub')
-def updated_after_pub():
-    return render_template('18-bar-updated_after_pub.html')
+# 19
+@app.route('/most_positive_articles_chart')
+def most_positive_articles_chart():
+    return render_template('sentiment_most_positive.html', title="Most Positive Articles")
 
+# 20
+@app.route('/most_negative_articles_chart')
+def most_negative_articles_chart():
+    return render_template('sentiment_most_negative.html', title="Most Negative Articles")
 
-#19
-#20
-@app.route('/last_x_days')
-def last_x_days():
-    return render_template('20-line-chart-popular_in_x_days.html')
+# 21
+@app.route('/author_articles')
+def author_articles():
+    return render_template('author_articles.html', title="Total Articles Written by a Specific Author")
 
-
-#21
-@app.route('/by_month')
-def by_month():
-    return render_template('21-bar-articles_by_month.html')
-
-#22
-@app.route('/word_count_range')
-def word_count_range():
-    return render_template('22-hist-word_count_range.html')
-
+# 22
+@app.route('/articles_by_keyword_chart')
+def articles_chart():
+    return render_template('articles_by_keyword.html', title="Specific Author")
 
 #23
+@app.route('/entites_chart')
+def entites_chart():
+    return render_template('entities.html', title="Top Entities Force-Directed Bubble Chart")
+
 #24
-#25
-#26
-@app.route('/more_than_n_words')
-def more_than_n_words():
-    return render_template('26-more_than_word_count.html')
-
-#27
-#28
-#29
-@app.route('/length_of_title')
-def length_of_title():
-    return render_template('29-spiral-bar-chart-length_of_title.html')
-
-
-#30
-
-# 1- Route for getting top keywords
-@app.route('/top_keywords', methods=['GET'])
-def top_keywords():
-    pipeline = [
-        {"$unwind": "$keywords"},
-        {"$group": {"_id": "$keywords", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": 10}
-    ]
-    result = list(collection.aggregate(pipeline))
-    jsonp_callback = request.args.get('callback')
-    if jsonp_callback:
-        content = f'{jsonp_callback}({jsonify(result).get_data(as_text=True)})'
-        return app.response_class(content, mimetype='application/javascript')
-    else:
-        return jsonify(result)
+@app.route('/top_entites_chart')
+def top_entites_chart():
+    return render_template('top_entities.html', title="Top Entities Force-Directed Bubble Chart")
 
 
 
-# 2- Route for getting top authors
+
+
+
+
+# 1
 @app.route('/top_authors', methods=['GET'])
 def top_authors():
     pipeline = [
@@ -263,26 +148,7 @@ def top_authors():
     result = list(collection.aggregate(pipeline))
     return jsonify(result)
 
-
-
-# 3- Articles by Date --> Returns the number of articles published on each date, sorted by date.
-@app.route('/articles_by_date', methods=['GET'])
-def articles_by_date():
-    pipeline = [
-        {"$project": {
-            "date": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$toDate": "$published_time"}}}
-        }},
-        {"$group": {"_id": "$date", "count": {"$sum": 1}}},
-        {"$sort": {"_id": 1}}
-    ]
-    results = list(collection.aggregate(pipeline))
-    formatted_results = {f"{result['_id']}": f"{result['count']} articles" for result in results}
-    return jsonify(formatted_results)
-
-
-
-
-# 4- Route for getting articles by word count
+# 2
 @app.route('/articles_by_word_count', methods=['GET'])
 def articles_by_word_count():
     pipeline = [
@@ -294,9 +160,7 @@ def articles_by_word_count():
     formatted_results = {f"{result['_id']} words": f"{result['count']} articles" for result in results}
     return jsonify(formatted_results)
 
-
-
-# 5- Route for getting articles by language
+# 3
 @app.route('/articles_by_language', methods=['GET'])
 def articles_by_language():
     pipeline = [
@@ -306,29 +170,7 @@ def articles_by_language():
     result = list(collection.aggregate(pipeline))
     return jsonify({item['_id']: item['count'] for item in result})
 
-
-# 6- Route for articles by classes
-@app.route('/articles_by_classes', methods=['GET'])
-def get_articles_by_classes():
-    # MongoDB aggregation pipeline
-    pipeline = [
-        {"$unwind": "$classes"},  # Unwind the classes array
-        {"$group": {
-            "_id": "$classes.value",  # Group by the value in the classes array
-            "count": {"$sum": 1}  # Count the number of occurrences
-        }},
-    ]
-
-    # Execute the aggregation pipeline
-    result = list(collection.aggregate(pipeline))
-
-    # Format the result for better readability
-    response = {item['_id']: item['count'] for item in result}
-
-    return jsonify(response)
-
-
-# 7- Route for getting articles by recent articles
+# 4
 @app.route('/recent_articles', methods=['GET'])
 def recent_articles():
     pipeline = [
@@ -342,79 +184,7 @@ def recent_articles():
     ]
     return jsonify(formatted_result)
 
-
-
-# 8- Route for getting articles by keyword/<keyword>-->Returns a list of articles that contain a specific keyword.
-@app.route('/articles_by_keyword/<keyword>', methods=['GET'])
-def get_articles_by_keyword(keyword):
-    # MongoDB query to find articles that contain the specific keyword in the keywords array
-    query = {"keywords": keyword}
-    projection = {"_id": 0, "title": 1, "url": 1, "description": 1}   # Adjust projection to return fields you want
-
-    # Find all matching articles
-    articles = list(collection.find(query, projection))
-
-    # Return the list of titles
-    return jsonify(articles)
-
-
-# 9- Route for getting articles by author/<author_name>-->Returns all articles written by a specific author
-@app.route('/articles_by_author/<author_name>', methods=['GET'])
-def articles_by_author(author_name):
-    # Decode the URL-encoded author name
-    author_name = request.view_args['author_name']
-    # Search for articles that have the specified author
-    query = {"author": author_name}
-    articles = collection.find(query)
-
-    # Format the response to include only the titles of the articles
-    formatted_result = [article["title"] for article in articles]
-    return jsonify(formatted_result)
-
-
-
-# 10-
-@app.route('/top_classes', methods=['GET'])
-def get_top_classes():
-    # MongoDB aggregation pipeline
-    pipeline = [
-        {"$unwind": "$classes"},  # Unwind the classes array
-        {"$group": {
-            "_id": "$classes.value",  # Group by the value in the classes array
-            "count": {"$sum": 1}  # Count the number of occurrences
-        }},
-        {"$sort": {"count": -1}},  # Sort by count in descending order
-        {"$limit": 10}  # Limit to top 10 classes
-    ]
-
-    # Execute the aggregation pipeline
-    result = list(collection.aggregate(pipeline))
-
-    # Format the result for better readability
-    response = {item['_id']: item['count'] for item in result}
-
-    return jsonify(response)
-
-
-# 11- Route for getting articles by author/
-@app.route('/article_details/<postid>', methods=['GET'])
-def article_details(postid):
-    # Search for an article that matches the given postid
-    article = collection.find_one({"postid": postid})
-
-    if article:
-        # Format and return the article details
-        article_details = {
-            "URL": article.get("url", "No URL available"),
-            "Title": article.get("title", "No title available"),
-            "Keywords": article.get("keywords", []),
-        }
-        return jsonify(article_details)
-    else:
-        return jsonify({"error": "Article not found"}), 404
-
-
-# 12- Route for getting articles with video -->Returns a list of articles that contain a video (where video_duration is not null).
+# 5
 @app.route('/articles_with_video', methods=['GET'])
 def get_articles_with_video():
     # MongoDB query to find articles where video_duration is not null
@@ -443,40 +213,7 @@ def get_articles_with_video():
     # Return the response as JSON
     return jsonify(response)
 
-
-
-
-
-# 13- Route for getting articles by publication year
-@app.route('/articles_by_year/<int:year>', methods=['GET'])
-def articles_by_year(year):
-    # Define the pipeline to match articles from the specified year
-    pipeline = [
-        {
-            "$match": {
-                "$expr": {
-                    "$eq": [{"$year": {"$dateFromString": {"dateString": "$published_time"}}}, year]
-                }
-            }
-        },
-        {
-            "$group": {
-                "_id": year,
-                "article_count": {"$sum": 1}
-            }
-        }
-    ]
-
-    result = list(collection.aggregate(pipeline))
-
-    if result:
-        return jsonify({f"{year}": f"{result[0]['article_count']} articles"})
-    else:
-        return jsonify({f"{year}": "0 articles"}), 404
-
-
-
-# 14- Route for getting the top 10 longest articles by word count
+# 6
 @app.route('/longest_articles', methods=['GET'])
 def longest_articles():
     pipeline = [
@@ -495,27 +232,7 @@ def longest_articles():
 
     return jsonify(formatted_result)
 
-
-# 15- Route for getting the top 10 shortest articles by word count
-@app.route('/shortest_articles', methods=['GET'])
-def shortest_articles():
-    pipeline = [
-        {"$sort": {"word_count": 1}},  # Sort articles by word count in ascending order
-        {"$limit": 10}  # Limit the result to the top 10 articles
-    ]
-
-    result = list(collection.aggregate(pipeline))
-
-    # Format the result to include only the title and word count
-    formatted_result = [
-        f'"{article["title"]}" ({article["word_count"]} words)'
-        for article in result
-    ]
-
-    return jsonify(formatted_result)
-
-
-# Route for getting the top 10 shortest articles by word count (greater than one word)
+# 7
 @app.route('/shortest_articles_not_zero', methods=['GET'])
 def shortest_articles_not_zero():
     pipeline = [
@@ -534,8 +251,7 @@ def shortest_articles_not_zero():
 
     return jsonify(formatted_result)
 
-
-# 16- Route for getting articles grouped by the number of keywords
+# 8
 @app.route('/articles_by_keyword_count', methods=['GET'])
 def get_articles_by_keyword_count():
     # MongoDB aggregation pipeline
@@ -556,8 +272,7 @@ def get_articles_by_keyword_count():
 
     return jsonify(response)
 
-
-# 17- Route for getting articles that have a thumbnail image
+# 9
 @app.route('/articles_with_thumbnail', methods=['GET'])
 def articles_with_thumbnail():
     # Find articles where the thumbnail field is not null or empty
@@ -584,43 +299,34 @@ def articles_with_thumbnail():
 
     return jsonify(result)
 
-
-# 18- Route for getting articles that were updated after publication
+#10
 @app.route('/articles_updated_after_publication', methods=['GET'])
 def articles_updated_after_publication():
-    # Find articles where the last_updated time is after the published_time
-    query = {
+    # Total number of articles (assuming you know there are 10,000 articles)
+    total_articles = 10000
+
+    # Query to find articles where the last_updated time is after the published_time
+    updated_query = {
         "$expr": {
             "$gt": ["$last_updated", "$published_time"]
         }
     }
-    articles = collection.find(query)
 
-    # Format the response to include only the titles of the articles
-    formatted_result = [article["title"] for article in articles if "title" in article]
+    # Count of updated articles
+    updated_count = collection.count_documents(updated_query)
 
-    return jsonify(formatted_result)
+    # Calculate the count of unupdated articles as 10000 - updated_count
+    unupdated_count = total_articles - updated_count
 
+    # Prepare the result
+    result = {
+        "updated_articles": updated_count,
+        "unupdated_articles": unupdated_count
+    }
 
+    return jsonify(result)
 
-# 19-
-@app.route('/articles_by_coverage/<coverage>', methods=['GET'])
-def get_articles_by_coverage(coverage):
-    # MongoDB query to find articles where classes array contains the specified coverage
-    query = {"classes": {"$elemMatch": {"mapping": "coverage", "value": coverage}}}
-    projection = {"_id": 0, "title": 1}  # Adjust projection to return the fields you want
-
-    # Find all matching articles
-    articles = list(collection.find(query, projection))
-
-    # Extract just the titles for the response
-    titles = [article["title"] for article in articles]
-
-    # Return the list of titles
-    return jsonify(titles)
-
-
-# 20- Route for getting the most popular keywords from day X and after
+# 11
 @app.route('/popular_keywords_last_<int:days>_days', methods=['GET'])
 def popular_keywords_last_X_days(days):
     # Calculate the start date, X days ago from today
@@ -656,11 +362,9 @@ def popular_keywords_last_X_days(days):
 
     return jsonify(formatted_result)
 
-
-
-# 21- Route for getting the number of articles published in a specific month and year
+# 12
 @app.route('/articles_by_month/<int:year>/<int:month>', methods=['GET'])
-def articles_by_month(year, month):
+def articles_by_month_route(year, month):
     try:
         # Parse the year and month into a datetime object representing the first day of that month
         start_date = datetime(year, month, 1)
@@ -700,10 +404,9 @@ def articles_by_month(year, month):
 
     return jsonify(formatted_result)
 
-
-# 22- Route for getting articles within a specific word count range
+# 13
 @app.route('/articles_by_word_count_range/<int:min>/<int:max>', methods=['GET'])
-def articles_by_word_count_range(min, max):
+def articles_by_word_count_range_route(min, max):
     # Define the pipeline to match articles within the specified word count range
     pipeline = [
         {
@@ -729,86 +432,9 @@ def articles_by_word_count_range(min, max):
 
     return jsonify(formatted_result)
 
-
-# 23- Route for getting articles with a specific number of keywords
-@app.route('/articles_with_specific_keyword_count/<int:count>', methods=['GET'])
-def get_articles_with_specific_keyword_count(count):
-    # MongoDB query to find articles with exactly the specified number of keywords
-    query = {"$expr": {"$eq": [{"$size": "$keywords"}, count]}}
-    projection = {"_id": 0, "title": 1, "keywords": 1}  # Include both title and keywords
-
-    # Find all matching articles
-    articles = list(collection.find(query, projection))
-
-    # Return the list of titles and keywords
-    return jsonify(articles)
-
-
-
-# 24- Route for getting articles published on a specific date
-# example: 2024-08-10
-@app.route('/articles_by_specific_date/<string:date>', methods=['GET'])
-def articles_by_specific_date(date):
-    try:
-        # Parse the date from the string (expected format: YYYY-MM-DD)
-        specific_date = datetime.strptime(date, "%Y-%m-%d")
-
-        # Define the start and end times for the specific date
-        start_date = specific_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = specific_date.replace(hour=23, minute=59, second=59, microsecond=999999)
-
-    except ValueError:
-        return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
-
-    # Define the pipeline to match articles within the specified date range
-    pipeline = [
-        {
-            "$match": {
-                "published_time": {"$gte": start_date.isoformat(), "$lte": end_date.isoformat()}
-            }
-        },
-        {
-            "$group": {
-                "_id": None,
-                "article_count": {"$sum": 1}
-            }
-        }
-    ]
-
-    result = list(collection.aggregate(pipeline))
-
-    # Format the result
-    if result and result[0]['article_count'] > 0:
-        formatted_result = f"Articles published on \"{date}\" ({result[0]['article_count']} articles)"
-    else:
-        formatted_result = f"Articles published on \"{date}\" (0 articles)"
-
-    return jsonify(formatted_result)
-
-
-
-# 25-
-@app.route('/articles_containing_text/<text>', methods=['GET'])
-def articles_containing_text(text):
-    # Fetch all documents (not recommended for large collections)
-    documents = list(collection.find({}, {"title": 1, "description": 1, "full_text": 1, "url": 1, "_id": 0}))
-    # Filter documents to find those containing the text
-    results = [
-        doc for doc in documents
-        if text.lower() in doc.get('title', '').lower() or
-           text.lower() in doc.get('description', '').lower() or
-           text.lower() in doc.get('full_text', '').lower()
-    ]
-
-    if not results:
-        return jsonify({"message": f"No articles containing '{text}' found"}), 404
-    return jsonify(results)
-
-
-
-# 26- Route for getting articles with more than a specified number of words
+# 14
 @app.route('/articles_with_more_than/<int:word_count>', methods=['GET'])
-def articles_with_more_than(word_count):
+def articles_with_more_than_route(word_count):
     # Define the pipeline to match articles with more than the specified word count
     pipeline = [
         {
@@ -834,58 +460,7 @@ def articles_with_more_than(word_count):
 
     return jsonify(formatted_result)
 
-
-
-# 27-
-@app.route('/articles_grouped_by_coverage', methods=['GET'])
-def get_articles_grouped_by_coverage():
-    # MongoDB aggregation pipeline
-    pipeline = [
-        {"$unwind": "$classes"},  # Unwind the classes array
-        {"$match": {"classes.mapping": "coverage"}},  # Match only classes with mapping 'coverage'
-        {"$group": {
-            "_id": "$classes.value",  # Group by the 'value' field where 'mapping' is 'coverage'
-            "count": {"$sum": 1}  # Count the number of articles in each group
-        }}
-    ]
-
-    # Execute the aggregation pipeline
-    result = list(collection.aggregate(pipeline))
-
-    # Format the result without sorting
-    response = {f"Coverage on {item['_id']}": item['count'] for item in result}
-
-    return jsonify(response)
-
-
-
-# 28- articles_last_X_hours --> Returns a list of articles published in the last X hours.
-import pytz
-
-@app.route('/articles_last_X_hours/<int:x>', methods=['GET'])
-def articles_last_x_hours(x):
-    # Calculate the datetime X hours ago
-    utc_now = datetime.now(pytz.utc)
-    x_hours_ago = utc_now - timedelta(hours=x)
-
-    # Query to find articles published in the last X hours
-    query = {
-        "published_time": {"$gte": x_hours_ago.isoformat()}
-    }
-    results = list(collection.find(query, {"title": 1, "published_time": 1, "_id": 0}))
-
-    # Formatting results for response
-    formatted_results = [
-        f"{doc['title']} (Published within the last {x} hours)"
-        for doc in results
-    ]
-    if not results:
-        return jsonify({"message": f"No articles published in the last {x} hours found"}), 404
-    return jsonify(formatted_results)
-
-
-
-# 29-
+# 15
 @app.route('/articles_by_title_length', methods=['GET'])
 def articles_by_title_length():
     # Query all articles and project only the title field
@@ -911,11 +486,215 @@ def articles_by_title_length():
 
     return jsonify(chart_data)
 
+# 16
+@app.route('/articles_by_date', methods=['GET'])
+def articles_by_date():
+    pipeline = [
+        {"$project": {
+            "date": {"$dateToString": {"format": "%Y-%m-%d", "date": {"$toDate": "$published_time"}}}
+        }},
+        {"$group": {"_id": "$date", "count": {"$sum": 1}}},
+        {"$sort": {"_id": 1}}
+    ]
+    results = list(collection.aggregate(pipeline))
+    formatted_results = {f"{result['_id']}": f"{result['count']} articles" for result in results}
+    return jsonify(formatted_results)
+
+# 17
+@app.route('/top_keywords', methods=['GET'])
+def top_keywords():
+    pipeline = [
+        {"$unwind": "$keywords"},
+        {"$group": {"_id": "$keywords", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]
+    result = list(collection.aggregate(pipeline))
+    jsonp_callback = request.args.get('callback')
+    if jsonp_callback:
+        content = f'{jsonp_callback}({jsonify(result).get_data(as_text=True)})'
+        return app.response_class(content, mimetype='application/javascript')
+    else:
+        return jsonify(result)
+
+# 18
+@app.route('/articles_by_sentiment_summary', methods=['GET'])
+def get_articles_by_sentiment_summary():
+    sentiments = ['positive', 'neutral', 'negative']
+    summary = []
+
+    for sentiment in sentiments:
+        count = collection.count_documents({'sentiment': sentiment})
+        summary.append({'sentiment': sentiment, 'count': count})
+
+    return jsonify(summary)
+
+# 19
+@app.route('/most_positive_articles', methods=['GET'])
+def get_most_positive_articles():
+    articles = collection.find().sort('sentiment_number', -1).limit(10)  # Sort by polarity in descending order (most positive)
+    result = []
+    for article in articles:
+        result.append({
+            'url': article['url'],
+            'title': article['title'],
+            'sentiment': article['sentiment'],
+            'sentiment_number': article['sentiment_number']
+        })
+    return jsonify(result)
+
+# 20
+@app.route('/most_negative_articles', methods=['GET'])
+def get_most_negative_articles():
+    articles = collection.find().sort('sentiment_number', 1).limit(10)  # Sort by polarity in ascending order (most negative)
+    result = []
+    for article in articles:
+        result.append({
+            'category': article['title'],  # Use the title as the category (spiral label)
+            'value': abs(article['sentiment_number'])  # Use the absolute sentiment number as value
+        })
+    return jsonify(result)
+
+# 21
+@app.route('/articles_by_author/<author_name>', methods=['GET'])
+def articles_by_author(author_name):
+    # Decode the URL-encoded author name
+    author_name = request.view_args['author_name']
+
+    # Search for articles that have the specified author
+    query = {"author": author_name}
+    articles = collection.find(query)
+
+    # Extract titles and count the articles
+    titles = [article["title"] for article in articles]
+    count = len(titles)
+
+    # Return a response with both the titles and the count
+    return jsonify({"titles": titles, "count": count})
+
+# 22
+@app.route('/articles_by_keyword/<keyword>', methods=['GET'])
+def get_articles_by_keyword(keyword):
+    query = {"keywords": {"$regex": keyword, "$options": "i"}}
+    projection = {"_id": 0, "title": 1, "url": 1, "description": 1}
+
+    # Limit the results to 15 articles
+    articles = list(collection.find(query, projection).limit(20))
+
+    # Transform data into the required format for the chart
+    chart_data = {
+        "value": 0,
+        "children": []
+    }
+
+    for article in articles:
+        chart_data["children"].append({
+            "name": article["title"],
+            "value": 1,  # You can adjust this based on your logic
+            "url": article["url"],
+            "description": article["description"]
+        })
+
+    return jsonify(chart_data)
+
+#23
+@app.route('/entities', methods=['GET'])
+def get_entities():
+    search_query = request.args.get('query', '')  # Get the search term from the query string
+
+    # MongoDB Aggregation query to group by 'entity' and 'type', and count occurrences
+    pipeline = [
+        {"$unwind": "$entities"},  # Unwind the 'entities' array
+        {"$match": {
+            "$or": [
+                {"entities.entity": {"$regex": search_query, "$options": "i"}},  # Search by entity name
+                {"entities.type": {"$regex": search_query, "$options": "i"}}  # Search by type
+            ]
+        }},
+        {"$group": {
+            "_id": {"entity": "$entities.entity", "type": "$entities.type"},  # Group by both 'entity' and 'type'
+            "count": {"$sum": 1}  # Count occurrences
+        }},
+        {"$sort": {"count": -1}},  # Sort by count, descending
+        {"$limit": 50}  # Limit the results to the top 50 to avoid performance issues
+    ]
+
+    # Run the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+
+    # Build response in JSON format
+    response = [{
+        "entity": row['_id']['entity'],
+        "type": row['_id']['type'],
+        "count": row['count']
+    } for row in result]
+
+    # Return the result as JSON
+    return jsonify(response), 200
+
+#24
+@app.route('/top_entities', methods=['GET'])
+def get_top_entities():
+    # MongoDB Aggregation pipeline to get top 5 entities by type
+    pipeline = [
+        {"$unwind": "$entities"},  # Unwind the 'entities' array
+        {"$group": {
+            "_id": {"entity": "$entities.entity", "type": "$entities.type"},  # Group by both 'entity' and 'type'
+            "count": {"$sum": 1}  # Count occurrences
+        }},
+        {"$sort": {"count": -1}},  # Sort by count, descending
+        {"$group": {
+            "_id": "$_id.type",  # Group by 'type' (LOC, ORG, etc.)
+            "top_entities": {
+                "$push": {
+                    "name": "$_id.entity",  # Store entity name
+                    "value": "$count"  # Store count as value
+                }
+            }
+        }},
+        {"$project": {
+            "_id": 1,
+            "top_entities": {"$slice": ["$top_entities", 5]}  # Get only the top 5 entities for each type
+        }}
+    ]
+
+    result = list(collection.aggregate(pipeline))
+
+    # Reformat data to match amCharts hierarchy structure
+    bubble_data = []
+    for item in result:
+        children = [{"name": entity['name'], "value": entity['value']} for entity in item['top_entities']]
+        bubble_data.append({
+            "name": item["_id"],  # The type (LOC, ORG, etc.)
+            "children": children  # Top entities as children
+        })
+
+    return jsonify(bubble_data), 200
 
 
+@app.route('/top_classes', methods=['GET'])
+def get_top_classes():
+    # MongoDB aggregation pipeline
+    pipeline = [
+        {"$unwind": "$classes"},  # Unwind the classes array
+        {"$match": {"classes.value": {"$ne": None}}},  # Filter out None values
+        {"$group": {
+            "_id": "$classes.value",  # Group by the value in the classes array
+            "count": {"$sum": 1}  # Count the number of occurrences
+        }},
+        {"$sort": {"count": -1}},  # Sort by count in descending order
+        {"$limit": 10}  # Limit to top 10 classes
+    ]
+
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result for better readability
+    response = {item['_id']: item['count'] for item in result}
+
+    return jsonify(response)
 
 
-# 30-
 
 
 if __name__ == '__main__':

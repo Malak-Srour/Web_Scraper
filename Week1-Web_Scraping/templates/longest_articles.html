@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Longest Articles by Word Count{% endblock %}
+
+{% block styles %}
+<!-- Include the specific styles for this chart -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/longest_articles_chart.css') }}">
+<style>
+    #chartdiv {
+            width: 100%;
+            height: 580px;
+        }
+</style>
+{% endblock %}
+
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/longest_articles_chart.js') }}"></script>
+{% endblock %}

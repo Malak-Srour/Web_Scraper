@@ -1,0 +1,32 @@
+        #controls {
+            margin: 20px;
+            text-align: center;
+        }
+
+        .button {
+            font-size: 1em;
+            padding: 0.4em 0.6em;
+            border-radius: 0.4em;
+            border: none;
+            background-color: #ffffff;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 2px 2px 3px #000000b4;
+            height: 2.4em;
+            box-sizing: border-box;
+        }
+
+        .input-field {
+            font-size: 1em;
+            padding: 0.4em 0.6em;
+            border-radius: 0.4em;
+            border: 1px solid #cccccc;
+            height: 2.4em;
+            box-sizing: border-box;
+        }
+
+        .label {
+            font-size: 1em;
+            margin-right: 10px;
+            vertical-align: middle;
+        }

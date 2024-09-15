@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Recent Articles{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/recent_articles.css') }}">
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Fetch the recent articles from the server
+  fetch('/recent_articles')
+    .then(response => response.json())
+    .then(data => {
+      // Create the table
+      var table = document.createElement("table");
+
+      // Add headers
+      var headerRow = document.createElement("tr");
+      var titleHeader = document.createElement("th");
+      titleHeader.innerHTML = "Title";
+      var dateHeader = document.createElement("th");
+      dateHeader.innerHTML = "Published Date";
+      headerRow.appendChild(titleHeader);
+      headerRow.appendChild(dateHeader);
+      table.appendChild(headerRow);
+
+      // Add rows
+      data.forEach(article => {
+        var row = document.createElement("tr");
+        var titleCol = document.createElement("td");
+        titleCol.innerHTML = article.title;
+        var dateCol = document.createElement("td");
+        dateCol.innerHTML = new Date(article.published_date).toLocaleDateString();
+        row.appendChild(titleCol);
+        row.appendChild(dateCol);
+        table.appendChild(row);
+      });
+
+      // Add table to document
+      document.getElementById("datatable").appendChild(table);
+    });
+</script>
+{% endblock %}

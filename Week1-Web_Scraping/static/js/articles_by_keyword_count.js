@@ -1,28 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Articles by Keyword Count</title>
-    <style>
-        #chartdiv {
-            width: 100%;
-            height: 500px;
-        }
-    </style>
-</head>
-<body>
-
-<!-- HTML -->
-<div id="chartdiv"></div>
-
-<!-- Resources -->
-<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-
-<!-- Chart code -->
-<script>
 am5.ready(function() {
 
   // Create root element
@@ -121,7 +96,3 @@ am5.ready(function() {
   chart.appear(1000, 100);
 
 }); // end am5.ready()
-</script>
-
-</body>
-</html>

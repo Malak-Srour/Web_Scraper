@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+  #chartdiv {
+    width: 100%;
+    max-width: 100%;
+    height: 550px;
+  }
+</style>
+{% endblock %}
+
+{% block controls %}
+<!-- You can add any additional controls here if needed -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+  am5.ready(function() {
+
+    // Create root element
+    var root = am5.Root.new("chartdiv");
+
+    // Set themes
+    root.setThemes([
+      am5themes_Animated.new(root)
+    ]);
+
+    var data = {
+      value: 0,
+      children: [
+        {
+          name: "ORG",
+          children: [
+            {
+              name: "كتائب القسام",
+              value: 3000
+            },
+            {
+              name: "الاحتلال الإسرائيلي",
+              value: 1780
+            },
+            {
+              name:  "قوات الاحتلال",
+              value: 1248
+            },
+            {
+              name:  "الاتحاد الأوروبي",
+              value: 807
+            },
+            {
+              name:  "المقاومة الإسلامية",
+              value: 699
+            }
+          ]
+        },
+        {
+          name: "LOC",
+          children: [
+            {
+              name: "غزة",
+              value: 14246
+            },
+            {
+              name: "إسرائيل",
+              value: 12102
+            },
+            {
+              name: "بيروت",
+              value: 10253
+            },
+            {
+              name: "الولايات المتحدة",
+              value: 3891
+            },
+            {
+              name: "لبنان",
+              value: 3462
+            }
+          ]
+        },
+        {
+          name: "MISC",
+          children: [
+            {
+              name: "دولار",
+              value: 755
+            },
+            {
+              name: "نيويورك تايمز",
+              value: 264
+            },
+            {
+              name: "يورو",
+              value: 190
+            },
+            {
+              name: "اليورانيوم",
+              value: 186
+            },
+            {
+              name: "إكس",
+              value: 149
+            },
+          ]
+        },
+        {
+          name: "PER",
+          children: [
+            {
+              name: "الفلسطينيين",
+              value: 4630
+            },
+            {
+              name: "إسرائيليين",
+              value: 3182
+            },
+            {
+              name: "طوفان الأقصى",
+              value: 3094
+            },
+            {
+              name: "نتنياهو",
+              value: 2881
+            },
+            {
+              name: "الإسرائيليين",
+              value: 1429
+            }
+          ]
+        },
+      ]
+    };
+
+    // Create wrapper container
+    var container = root.container.children.push(am5.Container.new(root, {
+      width: am5.percent(100),
+      height: am5.percent(100),
+      layout: root.verticalLayout
+    }));
+
+    // Create series
+    var series = container.children.push(am5hierarchy.ForceDirected.new(root, {
+      singleBranchOnly: false,
+      downDepth: 2,
+      topDepth: 1,
+      initialDepth: 1,
+      valueField: "value",
+      categoryField: "name",
+      childDataField: "children",
+      idField: "name",
+      linkWithField: "linkWith",
+      manyBodyStrength: -10,
+      centerStrength: 0.8
+    }));
+
+    series.get("colors").setAll({
+      step: 2
+    });
+
+    series.links.template.set("strength", 0.5);
+
+    series.data.setAll([data]);
+
+    series.set("selectedDataItem", series.dataItems[0]);
+
+    // Animate on load
+    series.appear(1000, 100);
+
+  }); // end am5.ready()
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/articles_with_more_than.css') }}">
+{% endblock %}
+
+{% block controls %}
+    <div class="container">
+        <input type="text" id="authorInput" class="input-field" placeholder="Enter Author Name">
+        <button class="button" id="loadButton">Load Data</button>
+    </div>
+<div id="chartdiv"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/author_articles.js') }}"></script>
+{% endblock %}
+

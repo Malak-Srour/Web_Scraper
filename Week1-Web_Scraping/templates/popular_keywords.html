@@ -1,36 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Most Popular Keywords in the Last X Days</title>
-    <style>
-        #chartdiv {
-            width: 100%;
-            height: 500px;
-        }
-        #controls {
-            margin: 20px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<div id="controls">
+{% block title %}
+    Most Popular Keywords in the Last X Days
+{% endblock %}
+
+{% block controls %}
     <label for="daysInput">Enter Number of Days: </label>
     <input type="number" id="daysInput" value="7" min="1">
     <button id="loadButton">Load Data</button>
+{% endblock %}
 
-</div>
-
-<div id="chartdiv"></div>
-
-<!-- Resources -->
-<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-
-<!-- Chart code -->
+{% block scripts %}
 <script>
 am5.ready(function() {
 
@@ -130,6 +110,4 @@ am5.ready(function() {
 
 }); // end am5.ready()
 </script>
-
-</body>
-</html>
+{% endblock %}

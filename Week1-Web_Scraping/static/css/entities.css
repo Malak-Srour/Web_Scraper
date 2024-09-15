@@ -1,0 +1,66 @@
+/* Center the main container */
+    .container {
+      margin-top: 50px;
+      max-width: 800px;
+    }
+
+    /* Search bar styling */
+    #search-bar {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 2px solid #007bff;
+      border-radius: 30px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      transition: 0.3s;
+    }
+
+    /* Search bar focus effect */
+    #search-bar:focus {
+      border-color: #0056b3;
+      box-shadow: 0px 4px 12px rgba(0, 123, 255, 0.5);
+      outline: none;
+    }
+
+    /* Table styling */
+    table {
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table header styling */
+    thead th {
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Table row hover effect */
+    tbody tr:hover {
+      background-color: #e9ecef;
+    }
+
+    /* Table cell padding */
+    tbody td {
+      padding: 12px;
+      text-align: center;
+    }
+
+    /* Table striping (optional) */
+    tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    /* Custom message when no results found */
+    .no-results {
+      text-align: center;
+      font-weight: bold;
+      color: #dc3545;
+    }
+
+    /* Add some spacing below the table */
+    table {
+      margin-bottom: 20px;
+    }

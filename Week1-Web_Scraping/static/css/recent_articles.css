@@ -1,0 +1,39 @@
+/* Base table styles */
+#datatable table {
+  font-family: Arial, sans-serif;
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Header styles with blue and white */
+#datatable table th {
+  background-color: #1565c0; /* Deep blue */
+  color: white; /* White text */
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Cell styles */
+#datatable table td {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  color: #1565c0; /* Deep blue text */
+}
+
+/* Row styles with alternating blue and white */
+#datatable table tr:nth-child(even) {
+  background-color: #e3f2fd; /* Very light blue for even rows */
+}
+
+#datatable table tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Hover effect */
+#datatable table tr:hover {
+  background-color: #90caf9; /* Light sky blue on hover */
+  color: #fff; /* White text on hover */
+}

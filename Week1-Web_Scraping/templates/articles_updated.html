@@ -1,27 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Articles by Thumbnail Presence</title>
-    <style>
-        #chartdiv {
-            width: 100%;
-            max-width: 100%;
-            height: 500px;
-        }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-<!-- HTML -->
-<div id="chartdiv"></div>
+{% block title %}Articles Updated After Publication{% endblock %}
 
-<!-- Resources -->
+
+
+{% block scripts %}
+<!-- Include amCharts 5 for creating the chart -->
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
 
-<!-- Chart code -->
 <script>
 am5.ready(function() {
 
@@ -53,8 +41,8 @@ am5.ready(function() {
 
   series.set("colors", am5.ColorSet.new(root, {
     colors: [
-      am5.color(0x89CFF0),
-      am5.color(0x9FA1A6)
+      am5.color(0x89CFF0),  // Color for updated articles
+      am5.color(0xFF6384)   // Color for unupdated articles
     ]
   }));
 
@@ -97,12 +85,12 @@ am5.ready(function() {
   });
 
   // Fetch data from the server and set the data for the chart
-  fetch('/articles_with_thumbnail')
+  fetch('/articles_updated_after_publication')
     .then(response => response.json())
     .then(data => {
       const formattedData = [
-        { category: "With Thumbnail", value: data.summary["With Thumbnail"] },
-        { category: "Without Thumbnail", value: data.summary["Without Thumbnail"] }
+        { category: "Updated Articles", value: data.updated_articles },
+        { category: "Unupdated Articles", value: data.unupdated_articles }
       ];
       series.data.setAll(formattedData);
 
@@ -124,6 +112,6 @@ am5.ready(function() {
 
 }); // end am5.ready()
 </script>
+{% endblock %}
 
-</body>
-</html>
+<div id="chartdiv" style="width: 100%; height: 500px;"></div>

@@ -1,26 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Articles by Title Length</title>
-    <style>
-        #chartdiv {
-            width: 60%; /* Set the width to 60% of the container */
-            height: 400px; /* Set the height to 400px */
-        }
-    </style>
-</head>
-<body>
-    <h1>Articles by Title Length</h1>
+{% extends "base.html" %}
 
-<div id="chartdiv"></div>
+{% block styles %}
+<style>
+    #chartdiv {
+        width: 60%; /* Set the width to 60% of the container */
+        height: 400px; /* Set the height to 400px */
+    }
+</style>
+{% endblock %}
 
-<!-- Resources -->
-<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-
-<!-- Chart code -->
+{% block scripts %}
 <script>
     am5.ready(function () {
 
@@ -133,6 +122,4 @@
 
     }); // end am5.ready()
 </script>
-
-</body>
-</html>
+{% endblock %}

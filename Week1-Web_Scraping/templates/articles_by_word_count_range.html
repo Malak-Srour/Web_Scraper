@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/articles_by_word_count_range.css') }}">
+{% endblock %}
+
+{% block controls %}
+    <label for="minInput" class="label">Min Word Count: </label>
+    <input type="number" id="minInput" class="input-field" value="280" min="0">
+    <label for="maxInput" class="label">Max Word Count: </label>
+    <input type="number" id="maxInput" class="input-field" value="300" min="0">
+    <button class="button" id="loadButton">Load Data</button>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    am5.ready(function() {
+
+        // Create root element
+        var root = am5.Root.new("chartdiv");
+
+        // Set themes
+        root.setThemes([
+            am5themes_Animated.new(root)
+        ]);
+
+        // Create chart
+        var chart = root.container.children.push(am5xy.XYChart.new(root, {
+            panX: true,
+            panY: true,
+            wheelX: "panX",
+            wheelY: "zoomX",
+            pinchZoomX: true,
+            paddingLeft: 0,
+            layout: root.verticalLayout
+        }));
+
+        chart.set("colors", am5.ColorSet.new(root, {
+            colors: [
+                am5.color(0x73556E),
+                am5.color(0x9FA1A6),
+                am5.color(0xF2AA6B),
+                am5.color(0xF28F6B),
+                am5.color(0xA95A52),
+                am5.color(0xE35B5D),
+                am5.color(0xFFA446)
+            ]
+        }));
+
+        // Create axes
+        var xRenderer = am5xy.AxisRendererX.new(root, {
+            minGridDistance: 50,
+            minorGridEnabled: true
+        });
+
+        xRenderer.grid.template.setAll({
+            location: 1
+        });
+
+        var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+            maxDeviation: 0.3,
+            categoryField: "wordCount",
+            renderer: xRenderer,
+            tooltip: am5.Tooltip.new(root, {})
+        }));
+
+        var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+            maxDeviation: 0.3,
+            min: 0,
+            renderer: am5xy.AxisRendererY.new(root, {
+                strokeOpacity: 0.1
+            })
+        }));
+
+        // Create series
+        var series = chart.series.push(am5xy.ColumnSeries.new(root, {
+            name: "Series 1",
+            xAxis: xAxis,
+            yAxis: yAxis,
+            valueYField: "count",
+            categoryXField: "wordCount",
+            tooltip: am5.Tooltip.new(root, {
+                labelText: "{valueY}"
+            })
+        }));
+
+        series.columns.template.setAll({
+            tooltipY: 0,
+            tooltipText: "{categoryX}: {valueY}",
+            shadowOpacity: 0.1,
+            shadowOffsetX: 2,
+            shadowOffsetY: 2,
+            shadowBlur: 1,
+            strokeWidth: 2,
+            stroke: am5.color(0xffffff),
+            shadowColor: am5.color(0x000000),
+            cornerRadiusTL: 50,
+            cornerRadiusTR: 50,
+            fillGradient: am5.LinearGradient.new(root, {
+                stops: [
+                    {}, // will use original column color
+                    { color: am5.color(0x000000) }
+                ]
+            }),
+            fillPattern: am5.GrainPattern.new(root, {
+                maxOpacity: 0.15,
+                density: 0.5,
+                colors: [am5.color(0x000000), am5.color(0x000000), am5.color(0xffffff)]
+            })
+        });
+
+        series.columns.template.states.create("hover", {
+            shadowOpacity: 1,
+            shadowBlur: 10,
+            cornerRadiusTL: 10,
+            cornerRadiusTR: 10
+        });
+
+        series.columns.template.adapters.add("fill", function(fill, target) {
+            return chart.get("colors").getIndex(series.columns.indexOf(target));
+        });
+
+        // Function to load data
+        function loadData(min, max) {
+            const promises = [];
+            const chartData = [];
+
+            for (let i = min; i <= max; i++) {
+                promises.push(fetch(`/articles_by_word_count_range/${i}/${i}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const match = data.match(/Articles between (\d+) and (\d+) words \((\d+) articles\)/);
+                        if (match) {
+                            chartData.push({ wordCount: i.toString(), count: parseInt(match[3]) });
+                        }
+                    }));
+            }
+
+            Promise.all(promises).then(() => {
+                xAxis.data.setAll(chartData);
+                series.data.setAll(chartData);
+            });
+        }
+
+        // Add X-axis label
+        var label = chart.plotContainer.children.push(am5.Label.new(root, {
+            text: "Word Count",
+            fontSize: 15,
+            x: am5.percent(50),
+            centerX: am5.percent(50),
+            y: am5.percent(100),
+            dy: 20
+        }));
+
+        // Event listener for the load button
+        document.getElementById("loadButton").addEventListener("click", function() {
+            const min = document.getElementById("minInput").value;
+            const max = document.getElementById("maxInput").value;
+            loadData(min, max);
+        });
+
+        // Initial load with default values
+        loadData(280, 300);
+
+        // Make stuff animate on load
+        series.appear(1000);
+        chart.appear(1000, 100);
+
+    }); // end am5.ready()
+    </script>
+{% endblock %}
