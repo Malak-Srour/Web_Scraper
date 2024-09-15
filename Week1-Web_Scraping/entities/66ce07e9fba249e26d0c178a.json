@@ -1,0 +1,43 @@
+{
+    "id": "66ce07e9fba249e26d0c178a",
+    "title": "حريق ضخم في البحر يلتهم آلاف السيارات!",
+    "full_text": "فاقم من الحريق وجود الحمولة التي تصل إلى 3000 سيارة، ما جعل السيطرة على النيران صعبة للغاية. اندلع حريق فجر على متن سفينة لشحن السيارات قبالة السواحل الهولندية كانت تحمل 3000 سيارة، حيث قتل شخص واحد على الأقل من أفراد طاقمها، وأصيب عدد آخر. وقالت المصادر إن سفينة الشحن كانت متجهة من ميناء بريمين في ألمانيا، إلى مصر. وأوضح خفر السواحل أن \"أفراد الطاقم حاولوا إخماد الحريق لكنهم فشلوا في ذلك\". واشتعلت النيران أمس الأربعاء في السفينة \"فريمانتل هايواي\" المسجلة في بنما، على بعد 50 كم شمال جزيرة أملاند الواقعة قبالة سواحل هولندا الشمالية، وفاقم من الحريق وجود الحمولة التي تصل إلى 3000 سيارة، ما جعل السيطرة على النيران صعبة للغاية. It may take weeks before the Car Transporter ship Fremantle Highway is completely burned out.Presumably an electric car on board the ship off the coast of the Netherlands caught fire.As a burning car battery needs to be submerged in water for at least 3 days to extinguish the… pic.twitter.com/EY6DOlSgDh \n\n واستعان خفر السواحل بمروحيات وقوارب الإنقاذ لإجلاء جميع أفراد الطاقم البالغ عددهم 23 شخصاً. An electric car aboard the Fremantle Highway carrier caught fire and caused the incident, which resulted in the death of a crew member and left several others injured. The ship was en route from Germany to Egypt. https://t.co/bieaiZpRsb \n\n ولا يزال سبب الحريق غير معروف، لكن التقارير الأولية تشير إلى أن اشتعال النيران في سيارة كهربائية على متن السفينة، قد يكون السبب. \n25 اب 07:43\n \n26 اب 13:30\n \n26 اب 14:29\n \n26 اب 15:02\n \n26 اب 20:16\n \n25 اب 06:42\n \n25 اب 09:18\n \n20 اب 16:41\n \n25 اب 07:43\n \n25 اب 19:55\n \nتصفح المزيد\n \nشبكة الميادين الإعلامية قناة فضائية عربية إخبارية مستقلة انطلقت في الحادي عشر من حزيران من العام 2012\nواتخذت من العاصمة بيروت مقرا لها.\n جميع الحقوق محفوظة",
+    "entities": [
+        {
+            "entity": "السواحل الهولندية",
+            "type": "LOC"
+        },
+        {
+            "entity": "ميناء بريمين",
+            "type": "LOC"
+        },
+        {
+            "entity": "ألمانيا",
+            "type": "LOC"
+        },
+        {
+            "entity": "مصر",
+            "type": "LOC"
+        },
+        {
+            "entity": "فريمانتل هايواي",
+            "type": "LOC"
+        },
+        {
+            "entity": "بنما",
+            "type": "LOC"
+        },
+        {
+            "entity": "أملاند",
+            "type": "LOC"
+        },
+        {
+            "entity": "هولندا الشمالية",
+            "type": "LOC"
+        },
+        {
+            "entity": "بيروت",
+            "type": "LOC"
+        }
+    ]
+}
