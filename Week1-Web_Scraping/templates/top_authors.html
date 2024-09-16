@@ -1,106 +1,78 @@
 {% extends "base.html" %}
 
+{% block styles %}
+    <!-- Styles specific to the top authors chart -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px;
+}
+</style>
+{% endblock %}
+
 {% block scripts %}
+    <!-- Resources for amCharts -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <!-- Chart code -->
+    <!-- Chart code -->
 <script>
-    am5.ready(function() {
-        // Fetch data from the Flask API
-        fetch('/top_authors')
-          .then(response => response.json())
-          .then(data => {
-            // Map data to the format required by amCharts
-            let chartData = data.map(item => ({
-              author: item._id, // author name
-              value: item.count // number of articles
-            }));
+am5.ready(function() {
 
-            // Create root element
-            var root = am5.Root.new("chartdiv");
+  // Create root element
+  var root = am5.Root.new("chartdiv");
 
-            // Set themes
-            root.setThemes([
-              am5themes_Animated.new(root)
-            ]);
+  // Set themes
+  root.setThemes([am5themes_Animated.new(root)]);
 
-            // Create chart
-            var chart = root.container.children.push(am5xy.XYChart.new(root, {
-              panX: true,
-              panY: true,
-              wheelX: "panX",
-              wheelY: "zoomX",
-              pinchZoomX: true,
-              paddingLeft:0,
-              paddingRight:1
-            }));
+  // Create chart
+  var chart = root.container.children.push(am5percent.SlicedChart.new(root, {
+    layout: root.verticalLayout
+  }));
 
-            // Add cursor
-            var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
-            cursor.lineY.set("visible", false);
+  // Create series
+  var series = chart.series.push(am5percent.FunnelSeries.new(root, {
+    alignLabels: false,
+    orientation: "vertical",
+    valueField: "value",
+    categoryField: "category"
+  }));
 
-            // Create axes
-            var xRenderer = am5xy.AxisRendererX.new(root, {
-              minGridDistance: 30,
-              minorGridEnabled: true
-            });
+  // Fetch data from Flask route
+  fetch('/top_authors_data')
+    .then(response => response.json())
+    .then(data => {
+      // Map the data returned from the Flask route to match the chart's format
+      const chartData = data.map(item => ({
+        category: item._id,  // Author name
+        value: item.count    // Number of articles by that author
+      }));
 
-            xRenderer.labels.template.setAll({
-              rotation: -90,
-              centerY: am5.p50,
-              centerX: am5.p100,
-              paddingRight: 15
-            });
+      // Set the data into the chart
+      series.data.setAll(chartData);
 
-            xRenderer.grid.template.setAll({
-              location: 1
-            });
+      // Play initial series animation
+      series.appear();
 
-            var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-              maxDeviation: 0.3,
-              categoryField: "author",
-              renderer: xRenderer,
-              tooltip: am5.Tooltip.new(root, {})
-            }));
+      // Create the legend AFTER the data is set
+      var legend = chart.children.push(am5.Legend.new(root, {
+        centerX: am5.p50,
+        x: am5.p50,
+        marginTop: 15,
+        marginBottom: 15
+      }));
 
-            var yRenderer = am5xy.AxisRendererY.new(root, {
-              strokeOpacity: 0.1
-            });
+      // Set legend data from the series after data is set
+      legend.data.setAll(series.dataItems);
+    })
+    .catch(error => console.error('Error fetching the data:', error));
 
-            var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-              maxDeviation: 0.3,
-              renderer: yRenderer,
-              logarithmic: true,  // Use logarithmic scale
-              extraMax: 0.1      // Add some extra space at the top of the scale
-            }));
+  // Make chart animate on load
+  chart.appear(1000, 100);
 
-            // Create series
-            var series = chart.series.push(am5xy.ColumnSeries.new(root, {
-              name: "Articles",
-              xAxis: xAxis,
-              yAxis: yAxis,
-              valueYField: "value",
-              sequencedInterpolation: true,
-              categoryXField: "author",
-              tooltip: am5.Tooltip.new(root, {
-                labelText: "{valueY}"
-              })
-            }));
-
-            series.columns.template.setAll({ cornerRadiusTL: 5, cornerRadiusTR: 5, strokeOpacity: 0 });
-            series.columns.template.adapters.add("fill", function (fill, target) {
-              return chart.get("colors").getIndex(series.columns.indexOf(target));
-            });
-
-            series.columns.template.adapters.add("stroke", function (stroke, target) {
-              return chart.get("colors").getIndex(series.columns.indexOf(target));
-            });
-
-            // Set data
-            xAxis.data.setAll(chartData);
-            series.data.setAll(chartData);
-
-            // Make stuff animate on load
-            series.appear(1000);
-            chart.appear(1000, 100);
-          });
-    }); // end am5.ready()
+}); // end am5.ready()
 </script>
+
 {% endblock %}

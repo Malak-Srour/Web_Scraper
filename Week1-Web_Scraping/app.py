@@ -16,9 +16,11 @@ def dashboard():
 
 
 # 1
-@app.route('/top_authors_chart')
+@app.route('/top_authors_chart', methods=['GET'])
 def top_authors_chart():
-    return render_template('top_authors.html', title="Top Authors Chart")
+    # Render the HTML template for the top authors chart
+    return render_template('top_authors.html', title="Top Authors")
+
 # 2
 @app.route('/articles_by_word_count_chart')
 def articles_by_word_count_chart():
@@ -92,7 +94,7 @@ def articles_by_date_chart():
     return render_template('articles_by_date.html', title="Articles by Date")
 
 # 17
-@app.route('/top_keywords_charts')
+@app.route('/top_keywords_chart')
 def top_keywords_wordcloud():
     return render_template('top_keywords_wordcloud.html', title="Top Keywords Word Cloud")
 
@@ -112,14 +114,14 @@ def most_negative_articles_chart():
     return render_template('sentiment_most_negative.html', title="Most Negative Articles")
 
 # 21
-@app.route('/author_articles')
+@app.route('/author_articles_chart')
 def author_articles():
     return render_template('author_articles.html', title="Total Articles Written by a Specific Author")
 
 # 22
 @app.route('/articles_by_keyword_chart')
 def articles_chart():
-    return render_template('articles_by_keyword.html', title="Specific Author")
+    return render_template('articles_by_keyword.html', title="Articles by Specific Keyword")
 
 #23
 @app.route('/entites_chart')
@@ -131,6 +133,16 @@ def entites_chart():
 def top_entites_chart():
     return render_template('top_entities.html', title="Top Entities Force-Directed Bubble Chart")
 
+# 25
+@app.route('/top_classes_chart')
+def top_classes_chart():
+    return render_template('top_classes.html', title="Top Classes")
+
+# 26
+@app.route('/last_x_hours_chart')
+def last_x_hours():
+    return render_template('last_x_hours.html', title="Last X Hours")
+
 
 
 
@@ -138,8 +150,8 @@ def top_entites_chart():
 
 
 # 1
-@app.route('/top_authors', methods=['GET'])
-def top_authors():
+@app.route('/top_authors_data', methods=['GET'])
+def top_authors_data():
     pipeline = [
         {"$group": {"_id": "$author", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},
@@ -156,9 +168,16 @@ def articles_by_word_count():
         {"$sort": {"_id": 1}}  # Sort by word count in ascending order
     ]
     results = list(collection.aggregate(pipeline))
-    # Formatting the result for better clarity in output as specified
-    formatted_results = {f"{result['_id']} words": f"{result['count']} articles" for result in results}
+
+    # Format the result and filter out entries where category is "0"
+    formatted_results = [
+        {"category": str(result["_id"]), "value": result["count"]}
+        for result in results if str(result["_id"]) != "0"  # Exclude category "0"
+    ]
+
     return jsonify(formatted_results)
+
+
 
 # 3
 @app.route('/articles_by_language', methods=['GET'])
@@ -267,10 +286,11 @@ def get_articles_by_keyword_count():
     # Execute the aggregation pipeline
     result = list(collection.aggregate(pipeline))
 
-    # Format the result for better readability
-    response = {f"{item['_id']} keywords": item['count'] for item in result}
+    # Format the result for better readability without the word "keywords"
+    response = {str(item['_id']): item['count'] for item in result}
 
     return jsonify(response)
+
 
 # 9
 @app.route('/articles_with_thumbnail', methods=['GET'])
@@ -520,14 +540,22 @@ def top_keywords():
 # 18
 @app.route('/articles_by_sentiment_summary', methods=['GET'])
 def get_articles_by_sentiment_summary():
+    # List of sentiments
     sentiments = ['positive', 'neutral', 'negative']
+
+    # Get total number of articles
+    total_articles = collection.count_documents({})
+
     summary = []
 
+    # Calculate count and percentage for each sentiment
     for sentiment in sentiments:
         count = collection.count_documents({'sentiment': sentiment})
-        summary.append({'sentiment': sentiment, 'count': count})
+        percentage = (count / total_articles) * 100 if total_articles > 0 else 0
+        summary.append({'sentiment': sentiment, 'count': count, 'percentage': percentage})
 
     return jsonify(summary)
+
 
 # 19
 @app.route('/most_positive_articles', methods=['GET'])
@@ -671,7 +699,7 @@ def get_top_entities():
 
     return jsonify(bubble_data), 200
 
-
+# 25
 @app.route('/top_classes', methods=['GET'])
 def get_top_classes():
     # MongoDB aggregation pipeline
@@ -683,17 +711,46 @@ def get_top_classes():
             "count": {"$sum": 1}  # Count the number of occurrences
         }},
         {"$sort": {"count": -1}},  # Sort by count in descending order
-        {"$limit": 10}  # Limit to top 10 classes
+        {"$limit": 5}  # Limit to top 5 classes
     ]
 
     # Execute the aggregation pipeline
     result = list(collection.aggregate(pipeline))
 
-    # Format the result for better readability
-    response = {item['_id']: item['count'] for item in result}
+    # Prepare data in a format for amCharts
+    chart_data = [{"category": item['_id'], "value": item['count']} for item in result]
 
-    return jsonify(response)
+    return jsonify(chart_data)
 
+
+
+import pytz
+
+
+@app.route('/articles_last_<int:x>_hours', methods=['GET'])
+def articles_last_x_hours(x):
+    # Calculate the datetime X hours ago
+    utc_now = datetime.now(pytz.utc)
+    x_hours_ago = utc_now - timedelta(hours=x)
+
+    # Query to find articles published in the last X hours
+    query = {
+        "published_time": {"$gte": x_hours_ago.isoformat()}
+    }
+    articles = collection.find(query)
+
+    # Extract titles and count the articles
+    titles = [article["title"] for article in articles]
+    count = len(titles)
+
+    # Return a response with both the titles and the count
+    if count == 0:
+        return jsonify({"message": f"No articles published in the last {x} hours found", "count": 0}), 404
+
+    return jsonify({
+        "titles": titles,  # List of article titles
+        "count": count  # Number of articles
+    })
 
 
 

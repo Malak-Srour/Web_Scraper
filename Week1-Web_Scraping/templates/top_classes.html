@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <style>
+  #chartdiv {
+    width: 100%;
+    height: 700px;
+  }
+</style>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  // Fetch the data from Flask API and render the chart
+  fetch('/top_classes')
+    .then(response => response.json())
+    .then(data => {
+      am5.ready(function() {
+
+        // Create root element
+        var root = am5.Root.new("chartdiv");
+
+        // Set themes
+        root.setThemes([
+          am5themes_Animated.new(root)
+        ]);
+
+        // Create chart
+        var chart = root.container.children.push(am5percent.SlicedChart.new(root, {
+          layout: root.verticalLayout
+        }));
+
+        // Create series
+        var series = chart.series.push(am5percent.PyramidSeries.new(root, {
+          orientation: "vertical",
+          valueField: "value",
+          categoryField: "category"
+        }));
+
+        // Set data from the Flask API
+        series.data.setAll(data.reverse());
+
+        // Play initial series animation
+        series.appear();
+
+        // Create legend
+        var legend = chart.children.push(am5.Legend.new(root, {
+          centerX: am5.percent(50),
+          x: am5.percent(50),
+          marginTop: 15,
+          marginBottom: 15
+        }));
+
+        legend.data.setAll(am5.array.copy(series.dataItems).reverse());
+
+        // Animate the chart on load
+        chart.appear(1000, 100);
+
+      }); // end am5.ready()
+    })
+    .catch(error => console.error('Error fetching chart data:', error));
+</script>{% endblock %}

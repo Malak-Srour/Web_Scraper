@@ -1,3 +1,7 @@
-pip install requests beautifulsoup4 lxml
-pip install json os
-pip install pymongo
+Flask
+pymongo
+stanza
+textblob
+requests
+beautifulsoup4
+lxml

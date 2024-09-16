@@ -103,32 +103,6 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
-                                        Articles Updated After Publication
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="articles_by_date"></div>
-<!--                                        <iframe src="/articles_updated_chart" width="100%" height="400"></iframe>-->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-bar me-1"></i>
-                                        Top Keywords
-                                    </div>
-                                    <div class="card-body">
-                                        <iframe src="/top_keywords_wordcloud" width="100%" height="400"></iframe>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-area me-1"></i>
                                         Top Authors Chart
                                     </div>
                                     <div class="card-body">
@@ -140,10 +114,10 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        Total Articles Written by a Specific Author
+                                        Top Keywords
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/author_articles" width="100%" height="400"></iframe>
+                                        <iframe src="/top_keywords_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -154,10 +128,35 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
-                                        Articles by Sentiment
+                                        Articles By Word Count
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/articles_by_sentiment_chart" width="100%" height="400"></iframe>
+                                        <iframe src="/articles_by_word_count_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Articles by Language
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_by_language_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        Articles by Date
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_by_date_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -168,7 +167,7 @@
                                         Articles by Word Count
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/articles_by_word_count_chart" width="100%" height="400"></iframe>
+                                        <iframe src="/recent_articles_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -191,10 +190,10 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        Articles with Video
+                                        Articles by Specific Keyword
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/articles_with_video_chart" width="100%" height="400"></iframe>
+                                        <iframe src="/articles_by_keyword_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -231,10 +230,10 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-area me-1"></i>
-                                        Articles by Keyword Count
+                                        Articles by a Specific Author
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="//articles_by_keyword_count_chart" width="100%" height="400"></iframe>
+                                        <iframe src="/author_articles_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -292,10 +291,10 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        Articles by Date
+                                        Top Classes
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/articles_by_date_chart" width="100%" height="400"></iframe>
+                                        <iframe src="/top_classes_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -321,6 +320,83 @@
                                     </div>
                                     <div class="card-body">
                                         <iframe src="/most_negative_articles_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        Articles with Video
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_with_video_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Articles by Keyword Count
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_by_keyword_count_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        Top Entities
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/top_entites_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Entities Table
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/entites_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        By Sentiment
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_by_sentiment_chart" width="100%" height="400"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Articles by Last X Hours
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/last_x_hours_chart" width="100%" height="400"></iframe>
                                     </div>
                                 </div>
                             </div>

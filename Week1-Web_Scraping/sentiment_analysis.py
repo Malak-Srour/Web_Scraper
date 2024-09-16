@@ -1,5 +1,3 @@
-# sentiment_analysis.py
-
 from pymongo import MongoClient
 from textblob import TextBlob
 

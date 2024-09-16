@@ -14,7 +14,7 @@
         am5.ready(function() {
 
             // Create root element
-            var root = am5.Root.new("articles_by_date");
+            var root = am5.Root.new("chartdiv");
 
             // Set themes
             root.setThemes([
