@@ -14,6 +14,39 @@ collection = db["articles"]
 def dashboard():
     return render_template('dashboard.html', title="Article Dashboard")
 
+@app.route('/authors_dashboard', methods=['GET'])
+def authors_dashboard():
+    # Render the HTML template for the top authors chart
+    return render_template('authorsdashboard.html', title="Authors")
+
+@app.route('/keywords_dashboard', methods=['GET'])
+def keywords_dashboard():
+    # Render the HTML template for the top authors chart
+    return render_template('keywords_dashboard.html', title="Keywords")
+
+@app.route('/date_time_dashboard', methods=['GET'])
+def date_time_dashboard():
+    # Render the HTML template for the top authors chart
+    return render_template('date_time_dashboard.html', title="Date and Time")
+
+@app.route('/word_count_dashboard', methods=['GET'])
+def word_count_dashboard_chart():
+    # Render the HTML template for the top authors chart
+    return render_template('word_count_dashboard.html', title="Word Count")
+
+@app.route('/classes_dashboard', methods=['GET'])
+def classes_dashboard_chart():
+    # Render the HTML template for the top authors chart
+    return render_template('classes_dashboard.html', title="Classes")
+
+@app.route('/sentiment_analysis_dashboard', methods=['GET'])
+def sentiment_dashboard_chart():
+    # Render the HTML template for the top authors chart
+    return render_template('sentiment_dashboard.html', title="Sentiment Analysis")
+
+
+
+
 
 # 1
 @app.route('/top_authors_chart', methods=['GET'])
@@ -25,6 +58,7 @@ def top_authors_chart():
 @app.route('/articles_by_word_count_chart')
 def articles_by_word_count_chart():
     return render_template('articles_by_word_count.html', title="Articles by Word Count")
+
 # 3
 @app.route('/articles_by_language_chart')
 def articles_by_language_chart():
@@ -34,10 +68,12 @@ def articles_by_language_chart():
 @app.route('/recent_articles_chart')
 def recent_articles_chart():
     return render_template('recent_articles.html', title="Recent Articles")
+
 # 5
 @app.route('/articles_with_video_chart')
 def articles_with_video_chart():
     return render_template('articles_with_video.html', title="Articles with and without Videos")
+
 # 6
 @app.route('/longest_articles_chart')
 def longest_articles_chart():
