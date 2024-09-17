@@ -1,0 +1,84 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+    <div class="container-fluid px-4">
+                <!-- Description Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                This section shows charts related to articles by date, time, and other date/time-related metrics.
+            </div>
+        </div>
+
+        <!-- Area Chart Example -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Articles by Month
+            </div>
+            <div class="card-body">
+                <iframe src="/articles_by_month" width="100%" height="400"></iframe>
+            </div>
+            <div class="card-footer small text-muted">Updated at {{ last_updated_time }}</div>
+        </div>
+
+        <!-- Bar and Pie Charts Row -->
+        <div class="row">
+            <!-- Bar Chart -->
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar me-1"></i>
+                        Recent Articles by Hour
+                    </div>
+                    <div class="card-body">
+                        <iframe src="/recent_articles_chart" width="100%" height="400"></iframe>
+                    </div>
+                    <div class="card-footer small text-muted">Updated at {{ last_updated_time }}</div>
+                </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-1"></i>
+                        Articles by Date
+                    </div>
+                    <div class="card-body">
+                        <iframe src="/articles_by_date_chart" width="100%" height="400"></iframe>
+                    </div>
+                    <div class="card-footer small text-muted">Updated at {{ last_updated_time }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Another Row of Charts -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-chart-area me-1"></i>
+                        Articles Updated After Publication
+                    </div>
+                    <div class="card-body">
+                        <iframe src="/articles_updated_chart" width="100%" height="400"></iframe>
+                    </div>
+                    <div class="card-footer small text-muted">Updated at {{ last_updated_time }}</div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-clock me-1"></i>
+                        Articles by Last X Hours
+                    </div>
+                    <div class="card-body">
+                        <iframe src="/last_x_hours_chart" width="100%" height="400"></iframe>
+                    </div>
+                    <div class="card-footer small text-muted">Updated at {{ last_updated_time }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

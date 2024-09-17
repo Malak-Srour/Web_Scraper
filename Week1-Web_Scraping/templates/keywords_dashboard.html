@@ -1,0 +1,52 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Top Keywords Chart
+            </div>
+            <div class="card-body">
+                <iframe src="/top_keywords_chart" width="100%" height="400"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Articles by Specific Keyword
+            </div>
+            <div class="card-body">
+                <iframe src="/articles_by_keyword_chart" width="100%" height="400"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-area me-1"></i>
+                Articles by Keyword Count
+            </div>
+            <div class="card-body">
+                <iframe src="/articles_by_keyword_count_chart" width="100%" height="400"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-1"></i>
+                Most Popular Keywords
+            </div>
+            <div class="card-body">
+                <iframe src="/popular_keywords_chart" width="100%" height="400"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
