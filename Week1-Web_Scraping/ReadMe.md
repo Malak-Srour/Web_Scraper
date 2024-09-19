@@ -39,13 +39,40 @@ Visualize data using amCharts. Implement charts to showcase insights like keywor
 #### Sample Charts:
 
 - **Top Authors Chart**:
-  ![Top Authors Chart](path_to_image/top_authors_chart.png)
+  ![Top Authors Chart](images/top_authors_chart.png)
 
 - **Keyword Frequency Word Cloud**:
-  ![Keyword Frequency Word Cloud](path_to_image/keyword_wordcloud.png)
+  ![Keyword Frequency Word Cloud](images/keyword_wordcloud.png)
 
-- **Articles by Language**:
-  ![Articles by Language](path_to_image/articles_by_language_chart.png)
+- **Articles by Word Count**:
+  ![Articles by Word Count](images/articles_by_word_count.png)
+
+- **Articles by Date**:
+  ![Articles by Date](images/articles_by_date.png)
+
+- **Longest Articles**:
+  ![Longest Articles](images/longest_articles.png)
+
+- **Shortest Articles**:
+  ![Shortest Articles](images/shortest_articles.png)
+
+- **Entities Table**:
+  ![Entities Table](images/entities_table.png)
+
+- **Articles With Video**:
+  ![Articles With Video](images/articles_with_video.png)
+
+- **Articles With More Than N Words**:
+  ![Articles With More Than N Words](images/more_than_n_words.png)
+
+- **Articles by Word Count Range**:
+  ![Articles by Word Count Range](images/articles_by_word_count_range.png)
+
+- **Articles by Sentiment**:
+  ![Articles by Sentiment](images/articles_by_sentiment.png)
+
+- **Articles by Month**:
+  ![Articles by MOnth](images/articles_by_month.png)
 
 ---
 
