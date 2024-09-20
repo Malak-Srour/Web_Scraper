@@ -1,18 +1,104 @@
-from flask import Flask, jsonify, request, render_template, send_from_directory
+from flask import Flask, jsonify, request, render_template, redirect, url_for, flash, session
 from pymongo import MongoClient
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+
+app.secret_key = 'super_secret_key'  # Make sure this is a strong, random key
+
 
 # Connect to MongoDB
 client = MongoClient("mongodb://localhost:27017/")
 db = client["almayadeen"]
 collection = db["articles"]
+users_collection = db["users"]
+
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        password = request.form['password'].strip()  # Strip whitespace from password
+        confirm_password = request.form['confirm_password'].strip()  # Strip whitespace from confirm_password
+
+        # Check if passwords match
+        if password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return redirect(url_for('register'))
+
+        # Check if user already exists
+        existing_user = users_collection.find_one({"email": email})
+        if existing_user:
+            flash('Email already registered', 'danger')
+            return redirect(url_for('register'))
+
+        # Hash the password securely using pbkdf2:sha256
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+        # Store the user in the database
+        users_collection.insert_one({
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": hashed_password
+        })
+
+        flash('Account created successfully! Please log in.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        # Check if the email exists in the database
+        user = users_collection.find_one({"email": email})
+
+        if user:
+            # Check if the password is correct
+            if check_password_hash(user['password'], password):
+                # Store user info in session
+                session['user_id'] = str(user['_id'])
+                session['email'] = user['email']
+                flash('Logged in successfully!', 'success')
+                return redirect(url_for('dashboard'))  # Redirect to some dashboard or homepage
+            else:
+                flash('Invalid password. Please try again.', 'danger')
+        else:
+            flash('Email not found. Please register first.', 'danger')
+
+        return redirect(url_for('login'))
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    # Clear the session to log out the user
+    session.clear()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
 
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html', title="Article Dashboard")
+    if 'user_id' in session:
+        return render_template('dashboard.html', title="Article Dashboard")
+    else:
+        flash('Please log in to access the dashboard.', 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/authors_dashboard', methods=['GET'])
 def authors_dashboard():

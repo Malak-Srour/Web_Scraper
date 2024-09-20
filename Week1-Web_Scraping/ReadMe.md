@@ -109,8 +109,9 @@ MongoDB: Ensure MongoDB is installed and running locally. Download it from [mong
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://your-repository-link.git
-   cd your-project-directory
+   git clone https://github.com/Malak-Srour/Web_Scraper.git
+   cd Web_Scraper
+
 
 2. **Install Required Python Libraries**:
    ```bash
