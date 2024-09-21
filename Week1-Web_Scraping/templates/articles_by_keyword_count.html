@@ -4,16 +4,9 @@
 
 {% block styles %}
 <!-- Include the specific styles for this chart -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/articles_by_keyword_count_chart.css') }}">
 {% endblock %}
 
 {% block scripts %}
-<!-- Include amCharts 5 for creating the chart -->
-<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
-<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
 <script src="{{ url_for('static', filename='js/articles_by_keyword_count.js') }}"></script>
-
 {% endblock %}
 

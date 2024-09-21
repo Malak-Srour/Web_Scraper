@@ -83,10 +83,10 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        Articles by Language
+                                        Updated Articles
                                     </div>
                                     <div class="card-body">
-                                        <iframe src="/articles_by_language_chart" width="100%" height="600"></iframe>
+                                        <iframe src="/articles_updated_chart" width="100%" height="600"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -116,6 +116,34 @@
                                 </div>
                             </div>
                         </div>
+
+
+<div class="row">
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-area me-1"></i>
+                                        Popular Keywords
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/popular_keywords_chart" width="100%" height="600"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-bar me-1"></i>
+                                        Articles by Specific Keyword
+                                    </div>
+                                    <div class="card-body">
+                                        <iframe src="/articles_by_keyword_chart" width="100%" height="600"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
 
                         <!-- Additional rows for more charts -->
                         <div class="row">
@@ -337,21 +365,6 @@
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <i class="fas fa-chart-bar me-1"></i>
-                                        Articles by Last X Hours
-                                    </div>
-                                    <div class="card-body">
-                                        <iframe src="/last_x_hours_chart" width="100%" height="600"></iframe>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-area me-1"></i>
                                         Articles by Thumbnail Presence
                                     </div>
                                     <div class="card-body">
@@ -360,5 +373,8 @@
                                 </div>
                             </div>
                         </div>
+
+
+
 
                 {% endblock %}
