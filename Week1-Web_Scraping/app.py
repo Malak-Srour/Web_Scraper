@@ -70,6 +70,7 @@ def login():
             if check_password_hash(user['password'], password):
                 # Store user info in session
                 session['user_id'] = str(user['_id'])
+                session['first_name'] = user['first_name']
                 session['email'] = user['email']
                 flash('Logged in successfully!', 'success')
                 return redirect(url_for('dashboard'))  # Redirect to some dashboard or homepage

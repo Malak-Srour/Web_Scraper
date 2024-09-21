@@ -1,20 +1,29 @@
 {% extends "base.html" %}
 
+{% block title %}By Sentiment{% endblock %}
 {% block styles %}
-<style>
-    #chartdiv {
-        width: 100%;
-        height: 500px;
-    }
-</style>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        #chartdiv {
+            width: 100%;
+            max-width: 600px;  /* Adjust the max width if needed */
+            height: 400px;     /* Adjust height as needed */
+        }
+
+
+    </style>
 {% endblock %}
 
 {% block scripts %}
-<!-- amCharts resources -->
-<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
-<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
-
 <script>
     am4core.ready(function() {
 
@@ -24,7 +33,7 @@
 
         // Create chart instance
         var chart = am4core.create("chartdiv", am4charts.PieChart);
-        chart.hiddenState.properties.opacity = 0; // This creates initial fade-in
+        chart.hiddenState.properties.opacity = 0; // Initial fade-in effect
         chart.radius = am4core.percent(70);
         chart.innerRadius = am4core.percent(40);
         chart.startAngle = 180;
@@ -54,7 +63,7 @@
                 // Apply a logarithmic transformation to the counts
                 const logData = data.map(item => ({
                     sentiment: item.sentiment,
-                    log_count: Math.log10(item.count + 1) // Adding 1 to avoid log(0)
+                    log_count: Math.log10(item.count + 1) // Avoid log(0) by adding 1
                 }));
 
                 // Set the chart's data
@@ -66,6 +75,5 @@
 </script>
 {% endblock %}
 
-{% block controls %}
-<div id="chartdiv"></div>
-{% endblock %}
+
+

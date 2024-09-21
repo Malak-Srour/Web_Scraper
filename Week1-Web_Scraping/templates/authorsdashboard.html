@@ -1,6 +1,14 @@
 {% extends "base_dashboard.html" %}
 
 {% block content %}
+<div class="container-fluid px-4">
+    <!-- Description Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            This section shows charts related to article authors and their contributions.
+        </div>
+    </div>
+
 <div class="row">
     <div class="col-xl-6">
         <div class="card mb-4">
@@ -9,7 +17,7 @@
                 Top Authors Chart
             </div>
             <div class="card-body">
-                <iframe src="/top_authors_chart" width="100%" height="600"></iframe>
+                <iframe src="/top_authors_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>
@@ -20,7 +28,7 @@
                 Articles by a Specific Author
             </div>
             <div class="card-body">
-                <iframe src="/author_articles_chart" width="100%" height="600"></iframe>
+                <iframe src="/author_articles_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>

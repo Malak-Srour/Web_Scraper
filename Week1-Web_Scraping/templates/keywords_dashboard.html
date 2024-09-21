@@ -1,6 +1,13 @@
 {% extends "base_dashboard.html" %}
 
 {% block content %}
+<div class="container-fluid px-4">
+    <!-- Description Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            This section shows charts related to keyword analysis in the articles.
+        </div>
+    </div>
 <div class="row">
     <div class="col-xl-6">
         <div class="card mb-4">
@@ -9,7 +16,7 @@
                 Top Keywords Chart
             </div>
             <div class="card-body">
-                <iframe src="/top_keywords_chart" width="100%" height="600"></iframe>
+                <iframe src="/top_keywords_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>
@@ -20,7 +27,7 @@
                 Articles by Specific Keyword
             </div>
             <div class="card-body">
-                <iframe src="/articles_by_keyword_chart" width="100%" height="600"></iframe>
+                <iframe src="/articles_by_keyword_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>
@@ -33,7 +40,7 @@
                 Articles by Keyword Count
             </div>
             <div class="card-body">
-                <iframe src="/articles_by_keyword_count_chart" width="100%" height="600"></iframe>
+                <iframe src="/articles_by_keyword_count_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>
@@ -44,7 +51,7 @@
                 Most Popular Keywords
             </div>
             <div class="card-body">
-                <iframe src="/popular_keywords_chart" width="100%" height="600"></iframe>
+                <iframe src="/popular_keywords_chart" scrolling="no" width="100%" height="600"></iframe>
             </div>
         </div>
     </div>
