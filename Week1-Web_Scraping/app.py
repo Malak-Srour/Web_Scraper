@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-app.secret_key = 'super_secret_key'  # Make sure this is a strong, random key
+app.secret_key = 'super_secret_key'
 
 
 # Connect to MongoDB
@@ -25,8 +25,8 @@ def register():
         first_name = request.form['first_name']
         last_name = request.form['last_name']
         email = request.form['email']
-        password = request.form['password'].strip()  # Strip whitespace from password
-        confirm_password = request.form['confirm_password'].strip()  # Strip whitespace from confirm_password
+        password = request.form['password'].strip()
+        confirm_password = request.form['confirm_password'].strip()
 
         # Check if passwords match
         if password != confirm_password:
@@ -369,6 +369,23 @@ def longest_articles():
     # Format the result to include the title, word count, and _id
     formatted_result = [
         f'Article ID: {article["_id"]}, "{article["title"]}" ({article["word_count"]} words)'
+        for article in result
+    ]
+
+    return jsonify(formatted_result)
+
+@app.route('/shortest_articles', methods=['GET'])
+def shortest_articles():
+    pipeline = [
+        {"$sort": {"word_count": 1}},  # Sort articles by word count in ascending order
+        {"$limit": 10}  # Limit the result to the top 10 articles
+    ]
+
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result to include only the title and word count
+    formatted_result = [
+        f'"{article["title"]}" ({article["word_count"]} words)'
         for article in result
     ]
 
@@ -875,6 +892,96 @@ def articles_last_x_hours(x):
         "count": count  # Number of articles
     })
 
+
+@app.route('/articles_grouped_by_coverage', methods=['GET'])
+def get_articles_grouped_by_coverage():
+    # MongoDB aggregation pipeline
+    pipeline = [
+        {"$unwind": "$classes"},  # Unwind the classes array
+        {"$match": {"classes.mapping": "coverage"}},  # Match only classes with mapping 'coverage'
+        {"$group": {
+            "_id": "$classes.value",  # Group by the 'value' field where 'mapping' is 'coverage'
+            "count": {"$sum": 1}  # Count the number of articles in each group
+        }}
+    ]
+
+    # Execute the aggregation pipeline
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result without sorting
+    response = {f"Coverage on {item['_id']}": item['count'] for item in result}
+
+    return jsonify(response)
+
+@app.route('/articles_containing_text/<text>', methods=['GET'])
+def articles_containing_text(text):
+    # Fetch all documents (not recommended for large collections)
+    documents = list(collection.find({}, {"title": 1, "description": 1, "full_text": 1, "url": 1, "_id": 0}))
+    # Filter documents to find those containing the text
+    results = [
+        doc for doc in documents
+        if text.lower() in doc.get('title', '').lower() or
+           text.lower() in doc.get('description', '').lower() or
+           text.lower() in doc.get('full_text', '').lower()
+    ]
+
+    if not results:
+        return jsonify({"message": f"No articles containing '{text}' found"}), 404
+    return jsonify(results)
+
+# example: 2024-08-10
+@app.route('/articles_by_specific_date/<string:date>', methods=['GET'])
+def articles_by_specific_date(date):
+    try:
+        # Parse the date from the string (expected format: YYYY-MM-DD)
+        specific_date = datetime.strptime(date, "%Y-%m-%d")
+
+        # Define the start and end times for the specific date
+        start_date = specific_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        end_date = specific_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Please use YYYY-MM-DD."}), 400
+
+    # Define the pipeline to match articles within the specified date range
+    pipeline = [
+        {
+            "$match": {
+                "published_time": {"$gte": start_date.isoformat(), "$lte": end_date.isoformat()}
+            }
+        },
+        {
+            "$group": {
+                "_id": None,
+                "article_count": {"$sum": 1}
+            }
+        }
+    ]
+
+    result = list(collection.aggregate(pipeline))
+
+    # Format the result
+    if result and result[0]['article_count'] > 0:
+        formatted_result = f"Articles published on \"{date}\" ({result[0]['article_count']} articles)"
+    else:
+        formatted_result = f"Articles published on \"{date}\" (0 articles)"
+
+    return jsonify(formatted_result)
+
+@app.route('/articles_by_coverage/<coverage>', methods=['GET'])
+def get_articles_by_coverage(coverage):
+    # MongoDB query to find articles where classes array contains the specified coverage
+    query = {"classes": {"$elemMatch": {"mapping": "coverage", "value": coverage}}}
+    projection = {"_id": 0, "title": 1}  # Adjust projection to return the fields you want
+
+    # Find all matching articles
+    articles = list(collection.find(query, projection))
+
+    # Extract just the titles for the response
+    titles = [article["title"] for article in articles]
+
+    # Return the list of titles
+    return jsonify(titles)
 
 
 if __name__ == '__main__':
