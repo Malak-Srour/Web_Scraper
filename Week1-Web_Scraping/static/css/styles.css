@@ -2200,11 +2200,21 @@ textarea.form-control-lg {
   border-radius: 0.5rem;
 }
 
+.center-form-check {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Optional, to vertically center if needed */
+    min-height: 100vh; /* Optional, if you want to center vertically relative to the viewport */
+}
+
 .form-check {
-  display: block;
+  display: flex;
   min-height: 1.5rem;
   padding-left: 1.5em;
   margin-bottom: 0.125rem;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Optional, to vertically center if needed */
+
 }
 .form-check .form-check-input {
   float: left;

@@ -51,7 +51,14 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-
+        .back-arrow {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            font-size: 24px;
+            color: #007bff; /* Adjust color as needed */
+        }
     </style>
 
     {% block styles %}
@@ -59,6 +66,9 @@
 </head>
 
 <body>
+
+    <!-- Back arrow link -->
+    <a href="/dashboard" class="back-arrow">&larr;</a>
 
     <!-- Dynamic content (for the chart and title) -->
     <h1>{{ title }}</h1>
