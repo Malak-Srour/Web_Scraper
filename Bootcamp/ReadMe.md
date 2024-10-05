@@ -62,11 +62,11 @@ Key API Endpoints:
 
 - **Registration Page**: Allows new users to create an account by providing a valid email, password, and other details.
   
-  ![Register Page](Bootcamp/images/register_page.png)
+  ![Register Page](images/register_page.png)
 
 - **Login Page**: Existing users can log in by providing their email and password.
 
-  ![Login Page](Bootcamp/images/login_page.png)
+  ![Login Page](images/login_page.png)
 
 ---
 
@@ -84,28 +84,28 @@ Key API Endpoints:
 
 **Sample Charts**:
 - **Top Authors Chart**:
-  ![Top Authors Chart](Bootcamp/images/top_authors_chart.png)
+  ![Top Authors Chart](images/top_authors_chart.png)
 
 - **Keyword Frequency Word Cloud**:
-  ![Keyword Frequency Word Cloud](Bootcamp/images/keyword_wordcloud.png)
+  ![Keyword Frequency Word Cloud](images/keyword_wordcloud.png)
 
 - **Articles by Word Count**:
-  ![Articles by Word Count](Bootcamp/images/articles_by_word_count.png)
+  ![Articles by Word Count](images/articles_by_word_count.png)
 
 - **Articles by Date**:
-  ![Articles by Date](Bootcamp/images/articles_by_date.png)
+  ![Articles by Date](images/articles_by_date.png)
 
 - **Longest Articles**:
-  ![Longest Articles](Bootcamp/images/longest_articles.png)
+  ![Longest Articles](images/longest_articles.png)
 
 - **Shortest Articles**:
-  ![Shortest Articles](Bootcamp/images/shortest_articles.png)
+  ![Shortest Articles](images/shortest_articles.png)
 
 - **Entities Table**:
-  ![Entities Table](Bootcamp/images/entities_table.png)
+  ![Entities Table](images/entities_table.png)
 
 - **Articles With Video**:
-  ![Articles With Video](Bootcamp/images/articles_with_video.png)
+  ![Articles With Video](images/articles_with_video.png)
 
 ---
 

@@ -9,7 +9,7 @@ db = client['almayadeen']
 collection = db['articles']
 
 # Step 2: Path to the folder containing JSON files (Fixed the path issue using raw string)
-folder_path = r'/Week1-Web_Scraping/entities'
+folder_path = r'/Bootcamp/entities'
 
 updated_count = 0
 
